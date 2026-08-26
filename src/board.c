@@ -99,6 +99,9 @@ void board_remove(int y, int x)
 
 int board_is_free(int y, int x)
 {
+    if (y < 0 || y >= BOARD_HIGHT || x < 0 || x >= BOARD_WIDTH) {
+        return 0;
+    }
     return board[y][x].free;
 }
 
