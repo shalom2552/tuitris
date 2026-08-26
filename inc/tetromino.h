@@ -8,13 +8,17 @@ typedef enum {
     L,
     ReverseL,
     Z,
-    ReverseZ
+    ReverseZ,
+    TETROMINO_COUNT,
 } TetrominoType;
 
-typedef struct {
-    TetrominoType type;
-    int rotation;
-} Tetromino;
+typedef struct Tetromino Tetromino;
+
+/* Initialize a new tetromino with random type */
+void tetromino_create(void);
+
+/* Moves the tetromino down one row */
+void tetromino_move(void);
 
 #endif // !TETROMINO_H
 
