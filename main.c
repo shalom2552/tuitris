@@ -26,7 +26,7 @@ int main(void)
 
     while (1) {
         board_draw();
-        tdraw_delay(30);
+        tdraw_delay(500);
     }
 
     tdraw_reset();

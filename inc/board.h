@@ -13,13 +13,13 @@ void board_init(void);
 void board_draw(void);
 
 /* Set a cell color at (x, y) position */
-void board_set(int x, int y, Color color);
+void board_set(int y, int x, Color color);
 
 /* Remove a cell at (x, y) position */
 void board_remove(int y, int x);
 
 /* Return 1 if (x, y) is free, 0 otherwise */
-int board_is_free(int x, int y);
+int board_is_free(int y, int x);
 
 #endif // !BOARD_H
 
