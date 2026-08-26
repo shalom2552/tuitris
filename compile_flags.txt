@@ -1,0 +1,8 @@
+-Iinc
+-Wall
+-Wextra
+-Werror
+-pedantic
+-std=c17
+
+
