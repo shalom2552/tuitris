@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -pedantic -std=c17 -Iinc -g
+CFLAGS = -Wall -Wextra -pedantic -std=c17 -Iinc -g -pthread
 
 TRG = game
 SRC = main.c $(wildcard src/*.c)

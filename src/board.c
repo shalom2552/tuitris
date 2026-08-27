@@ -5,9 +5,6 @@
 
 // === Defines ================================================================
 
-#define REQUIRE_HEIGHT BOARD_HIGHT + 4
-#define REQUIRE_WIDTH (BOARD_WIDTH + 4) * 2
-
 #define BLOCK_EMPTY "  "
 #define BLOCK_FILL "██"
 #define BAR_FILL "████████████████████████"
@@ -83,10 +80,6 @@ void board_init(void)
 
 void board_draw(void)
 {
-    if (!tdraw_term_size_ok(REQUIRE_HEIGHT, REQUIRE_WIDTH)) {
-        return;
-    }
-
     clear_screen();
     draw_board_border();
     draw_board_cells();

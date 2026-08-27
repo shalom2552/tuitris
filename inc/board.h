@@ -6,6 +6,9 @@
 #define BOARD_HIGHT 20
 #define BOARD_WIDTH 10
 
+#define REQUIRE_HEIGHT BOARD_HIGHT + 4
+#define REQUIRE_WIDTH (BOARD_WIDTH + 4) * 2
+
 /* Initialize an empty board */
 void board_init(void);
 
