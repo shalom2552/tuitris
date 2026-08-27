@@ -53,7 +53,24 @@ static inline void tdraw_draw_centered_line(int y, const char* format, ...) {
     int w; tdraw_term_size(NULL, &w);
     int len = 0; for (char* p = buf; *p; p++) if (*p == '\033') { while (*p && !isalpha(*p)) p++; } else len++;
     int x = (w - len) / 2 + 1;
-    printf("\033[s\033[%d;1H\033[2K\033[%d;%dH%s\033[u", y, y, x < 1 ? 1 : x, buf);
+    printf("\033[s\033[%d;1H\033[%d;%dH%s\033[u", y, y, x < 1 ? 1 : x, buf);
+}
+
+// === Boarder ================================================================
+/* Draw a frame around two edges */
+static inline void tdraw_draw_frame(int y1, int x1, int y2, int x2) {
+    for (int i = y1; i <= y2; ++i) {
+        tdraw_draw_at(i, x1, "│");
+        tdraw_draw_at(i, x2, "│");
+    }
+    for (int i = x1; i <= x2; ++i) {
+        tdraw_draw_at(y1, i, "─");
+        tdraw_draw_at(y2, i, "─");
+    }
+    tdraw_draw_at(y1, x1, "┌");
+    tdraw_draw_at(y1, x2, "┐");
+    tdraw_draw_at(y2, x1, "└");
+    tdraw_draw_at(y2, x2, "┘");
 }
 
 // === Utils ==================================================================
