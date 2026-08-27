@@ -14,8 +14,9 @@ typedef enum {
 
 typedef struct Tetromino Tetromino;
 
-/* Initialize a new tetromino with random type */
-void tetromino_create(void);
+/* Initialize a new tetromino with random type 
+ * Returns 0 on success, 1 on failure */
+int tetromino_create(void);
 
 /* Moves the tetromino down one row if it can */
 void tetromino_move_down(void);

@@ -52,13 +52,29 @@ static Pos block_pos(int i)
     return (Pos){ .y = t.pos.y + t.shape.blocks[i].y, .x = t.pos.x + t.shape.blocks[i].x };
 }
 
-/* Adds the tetromino to the board. */
-static void add_tetromino(void)
+/* Returns 1 if can place the tetromino, 0 otherwise. */
+static int can_place(void)
 {
     for (int i = 0; i < BLOCKS_COUNT; ++i) {
         Pos p = block_pos(i);
-        board_set(p.y, p.x, t.color);
+        if (!board_is_free(p.y, p.x)) {
+            return 0;
+        }
     }
+    return 1;
+}
+
+/* Adds the tetromino to the board. */
+static int place_tetromino(void)
+{
+    if (can_place()) {
+        for (int i = 0; i < BLOCKS_COUNT; ++i) {
+            Pos p = block_pos(i);
+            board_set(p.y, p.x, t.color);
+        }
+        return 0;
+    }
+    return 1;
 }
 
 /* Removes the tetromino from the board. */
@@ -89,7 +105,7 @@ static void move(int dy, int dx)
         t.pos.y += dy;
         t.pos.x += dx;
     }
-    add_tetromino();
+    place_tetromino();
 }
 
 /* Rotates a block around its center by a given direction (1 or -1). */
@@ -127,14 +143,14 @@ static void rotate(int dir)
 
 // === Public API =============================================================
 
-void tetromino_create(void)
+int tetromino_create(void)
 {
-    t.pos.y = 0; t.pos.x = 4;
+    t.pos.y = 1; t.pos.x = 4;
     t.type = rand() % TETROMINO_COUNT;
     t.shape = INITIAL_SHAPES[t.type];
     t.color = TYPE_COLOR[t.type];
     if (rand() % 2) rotate(1);
-    add_tetromino(); // TODO: check if can create
+    return place_tetromino();
 }
 
 void tetromino_move_down(void)
@@ -156,17 +172,20 @@ void tetromino_rotate_right(void)
 {
     remove_tetromino();
     rotate(1);
-    add_tetromino();
+    place_tetromino();
 }
 
 void tetromino_rotate_left(void)
 {
     remove_tetromino();
     rotate(-1);
-    add_tetromino();
+    place_tetromino();
 }
 
 int tetromino_locked(void)
 {
-    return can_move(1, 0);
+    remove_tetromino();
+    int locked = !can_move(1, 0);
+    place_tetromino();
+    return locked;
 }
