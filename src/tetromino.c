@@ -14,13 +14,13 @@ typedef struct { Pos blocks[BLOCKS_COUNT]; } Shape;
 
 // Shape position is relative to tetromino position
 static const Shape INITIAL_SHAPES[TETROMINO_COUNT] = {
-    [Straight] = { .blocks = { { 0, 0 }, { 0, 1 }, { 0, 2 }, { 0, 3 } } },
+    [Straight] = { .blocks = { { 0, -1 }, { 0, 0 }, { 0, 1 }, { 0, 2} } },
     [Square]   = { .blocks = { { 0, 0 }, { 0, 1 }, { 1, 0 }, { 1, 1 } } },
-    [T]        = { .blocks = { { 0, 0 }, { 0, 1 }, { 0, 2 }, { 1, 1 } } },
-    [L]        = { .blocks = { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 2, 1 } } },
-    [ReverseL] = { .blocks = { { 0, 1 }, { 1, 1 }, { 2, 1 }, { 2, 0 } } },
-    [Z]        = { .blocks = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 2, 1 } } },
-    [ReverseZ] = { .blocks = { { 0, 1 }, { 1, 0 }, { 1, 1 }, { 2, 0 } } },
+    [T]        = { .blocks = { { 0, -1 }, { 0, 0 }, { 0, 1 }, { 1, 0 } } },
+    [L]        = { .blocks = { { -1, 0 }, { 0, 0 }, { 1, 0 }, { 1, 1 } } },
+    [ReverseL] = { .blocks = { { -1, 0 }, { 0, 0 }, { 1, 0 }, { 1, -1 } } },
+    [Z]        = { .blocks = { { -1, 0 }, { 0, 0 }, { 0, 1 }, { 1, 1 } } },
+    [ReverseZ] = { .blocks = { { -1, 0 }, { 0, 0 }, { 0, -1 }, { 1, -1 } } },
 };
 
 static const Color TYPE_COLOR[TETROMINO_COUNT] = {
@@ -46,6 +46,7 @@ static Tetromino t;
 
 // === Helper Functions =======================================================
 
+/* Returns the position of the i'th block. */
 static Pos block_pos(int i)
 {
     return (Pos){ .y = t.pos.y + t.shape.blocks[i].y, .x = t.pos.x + t.shape.blocks[i].x };
@@ -116,6 +117,7 @@ static int can_rotate(int dir)
 /* Rotates the tetromino around its center. */
 static void rotate(int dir)
 {
+    if (t.type == Square) return; // no-op
     if (can_rotate(dir)) {
         for (int i = 0; i < BLOCKS_COUNT; ++i) {
             rotate_block(&t.shape.blocks[i] , dir);

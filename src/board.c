@@ -19,6 +19,12 @@ static struct Cell board[BOARD_HIGHT][BOARD_WIDTH];
 
 // === Helper Functions =======================================================
 
+/* Returns 1 if the position is outside of the board */
+static int invalid_pos(int y, int x)
+{
+    return (y < 0 || y >= BOARD_HIGHT || x < 0 || x >= BOARD_WIDTH);
+}
+
 /* Draws the border of the board. */
 static void draw_board_border(void)
 {
@@ -87,21 +93,21 @@ void board_draw(void)
 
 void board_set(int y, int x, Color color)
 {
+    if (invalid_pos(y, x)) return;
     board[y][x].free = 0;
     board[y][x].color = color;
 }
 
 void board_remove(int y, int x)
 {
+    if (invalid_pos(y, x)) return;
     board[y][x].free = 1;
     board[y][x].color = NONE;
 }
 
 int board_is_free(int y, int x)
 {
-    if (y < 0 || y >= BOARD_HIGHT || x < 0 || x >= BOARD_WIDTH) {
-        return 0;
-    }
+    if (invalid_pos(y, x)) return 0;
     return board[y][x].free;
 }
 
