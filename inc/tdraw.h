@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <threads.h>
 #include <time.h>
-#include <string.h>
+#include <ctype.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
@@ -51,7 +51,8 @@ static inline void tdraw_draw_centered_line(int y, const char* format, ...) {
     char buf[256]; va_list ap;
     va_start(ap, format); vsnprintf(buf, sizeof(buf), format, ap); va_end(ap);
     int w; tdraw_term_size(NULL, &w);
-    int x = (w - (int)strlen(buf)) / 2 + 1;
+    int len = 0; for (char* p = buf; *p; p++) if (*p == '\033') { while (*p && !isalpha(*p)) p++; } else len++;
+    int x = (w - len) / 2 + 1;
     printf("\033[s\033[%d;1H\033[2K\033[%d;%dH%s\033[u", y, y, x < 1 ? 1 : x, buf);
 }
 
@@ -63,8 +64,9 @@ static inline int tdraw_term_size_ok(int req_h, int req_w) {
     tdraw_term_size(&h, &w);
     if (h < req_h || w < req_w) {
         tdraw_clear();
-        tdraw_draw_centered_line(h / 2 - 0, "Terminal too small.");
-        tdraw_draw_centered_line(h / 2 - 0, "Width = %d Height = %d", w, h);
+        tdraw_draw_centered_line(h / 2 - 1, "Terminal too small.");
+        tdraw_draw_centered_line(h / 2 - 0, "Width = \033[3%dm%d\033[0m Height = \033[3%dm%d\033[0m",
+                                w < req_w ? 1 : 2, w, h < req_h ? 1 : 2, h);
         tdraw_draw_centered_line(h / 2 + 2, "Needed:");
         tdraw_draw_centered_line(h / 2 + 3, "Width: %d Height: %d", req_w, req_h);
         return 0;
@@ -75,7 +77,7 @@ static inline int tdraw_term_size_ok(int req_h, int req_w) {
 // === Init & handlers ========================================================
 /* Reset all styles and modes */
 static inline void tdraw_reset(void) {
-    printf("\033[0m\033[?25h");
+    printf("\033[0m\033[?25h\033[?1049l");
     fflush(stdout);
 }
 
@@ -90,7 +92,7 @@ static inline void tdraw_init(void) {
     signal(SIGINT, _sig_handler);
     signal(SIGTERM, _sig_handler);
     atexit(tdraw_reset);
-    printf("\033[?25l\033[H");
+    printf("\033[?1049h\033[?25l\033[H\033[J");
 }
 
 #endif // !TDRAW_H_1331063137
