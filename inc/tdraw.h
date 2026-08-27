@@ -63,10 +63,10 @@ static inline int tdraw_term_size_ok(int req_h, int req_w) {
     tdraw_term_size(&h, &w);
     if (h < req_h || w < req_w) {
         tdraw_clear();
-        tdraw_draw_centered_line(h / 2 - 2, "Terminal too small.");
-        tdraw_draw_centered_line(h / 2 - 1, "Width = %d Height = %d", w, h);
-        tdraw_draw_centered_line(h / 2 + 1, "Needed:");
-        tdraw_draw_centered_line(h / 2 + 2, "Width: %d Height: %d", req_w, req_h);
+        tdraw_draw_centered_line(h / 2 - 0, "Terminal too small.");
+        tdraw_draw_centered_line(h / 2 - 0, "Width = %d Height = %d", w, h);
+        tdraw_draw_centered_line(h / 2 + 2, "Needed:");
+        tdraw_draw_centered_line(h / 2 + 3, "Width: %d Height: %d", req_w, req_h);
         return 0;
     }
     return 1;
