@@ -44,7 +44,6 @@ struct Tetromino {
 };
 static Tetromino t;
 
-
 // === Helper Functions =======================================================
 
 /* Returns the position of the i'th block. */

@@ -4,6 +4,7 @@
 #include "tetromino.h"
 #include "tdraw.h"
 #include "input.h"
+#include "ui.h"
 
 #include <stdatomic.h>
 #include <pthread.h>
@@ -12,16 +13,22 @@
 #include <time.h>
 #include <unistd.h>
 
-pthread_mutex_t mtx;
-atomic_bool g_pause = false;
-atomic_int g_delay = 1000; // ms
+// === Variables ==============================================================
 
+pthread_mutex_t mtx;
+atomic_int g_delay = 1000; // ms
+bool g_pause = false;
+
+// === Helper Functions =======================================================
+
+/* Handles user input events */
 static void* input_task(void* args)
 {
     (void)args;
     while (1) {
         InputEvent event = get_user_input(); // blocking
         pthread_mutex_lock(&mtx);
+        if (g_pause && event != INPUT_PAUSE && event != INPUT_QUIT) continue;
         switch (event) {
             case INPUT_QUIT: game_end(); break;
             case INPUT_PAUSE: g_pause = !g_pause; break;
@@ -33,18 +40,19 @@ static void* input_task(void* args)
             case INPUT_MINUS: game_speed_down(); break;
             default: break;
         }
-        board_draw();
+        ui_draw();
         pthread_mutex_unlock(&mtx);
     }
     return NULL;
 }
+
+// === Public API =============================================================
 
 void game_init(void)
 {
     input_init();
     tdraw_init();
     board_init();
-
     srand(time(NULL));
     pthread_mutex_init(&mtx, NULL);
 }
@@ -53,30 +61,29 @@ void game_start(void)
 {
     pthread_t tid;
     if (pthread_create(&tid, NULL, input_task, NULL) != 0) {
-        exit(1);
+        return;
     }
 
-    board_draw();
+    ui_draw();
     tetromino_create();
     while (1) {
-        while (!tdraw_term_size_ok(REQUIRE_HEIGHT, REQUIRE_WIDTH)) {
-            tdraw_delay(10);
-        }
+        ui_validate();
+        pthread_mutex_lock(&mtx);
         if (!g_pause) {
-            pthread_mutex_lock(&mtx);
             if (tetromino_locked()) {
                 board_clear_lines();
                 if (!tetromino_create()) {
-                    game_end();
+                    game_end(); break;
                 }
             } else {
                 tetromino_move_down();
             }
-            board_draw();
-            pthread_mutex_unlock(&mtx);
         }
+        ui_draw();
+        pthread_mutex_unlock(&mtx);
         tdraw_delay(g_delay);
     }
+    pthread_join(tid, NULL);
 }
 
 void game_pause(void)

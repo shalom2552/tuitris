@@ -69,6 +69,9 @@ static inline void tdraw_draw_centered_line(int y, const char* format, ...) {
 /* Draw a frame around two edges */
 static inline void tdraw_draw_frame(int y1, int x1, int y2, int x2) {
     for (int i = y1; i <= y2; ++i) {
+        for (int j = x1 + 1; j < x2; ++j) {
+            tdraw_draw_at(i, j, " ");
+        }
         tdraw_draw_at(i, x1, "│");
         tdraw_draw_at(i, x2, "│");
     }
@@ -83,7 +86,6 @@ static inline void tdraw_draw_frame(int y1, int x1, int y2, int x2) {
 }
 
 // === Utils ==================================================================
-
 /* Returns 1 if the terminal size is sufficient for the requested dimensions, 0 otherwise */
 static inline int tdraw_term_size_ok(int req_h, int req_w) {
     int h; int w;
@@ -101,7 +103,6 @@ static inline int tdraw_term_size_ok(int req_h, int req_w) {
 }
 
 // === Init & handlers ========================================================
-
 /* Reset all styles and modes */
 static inline void tdraw_reset(void) {
     if (_tdraw_active) {

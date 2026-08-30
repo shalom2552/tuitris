@@ -1,21 +1,15 @@
 #include "board.h"
-#include "tdraw.h"
 #include "color.h"
 
 #include <stdbool.h>
 
-// === Defines ================================================================
-
-#define BLOCK_EMPTY "  "
-#define BLOCK_FILL "██"
-#define BAR_FILL "████████████████████████"
-#define BOARD_START_POS_Y(h) (h - BOARD_HIGHT) / 2 + 1
-#define BOARD_START_POS_X(w) (w - BOARD_WIDTH * 2) / 2 + 1
-
-// === Globals ================================================================
+// === Variables ==============================================================
 
 /* Board data structure. */
-struct Cell { int free; Color color; };
+struct Cell {
+    int free;
+    Color color;
+};
 static struct Cell board[BOARD_HIGHT][BOARD_WIDTH];
 
 // === Helper Functions =======================================================
@@ -24,47 +18,6 @@ static struct Cell board[BOARD_HIGHT][BOARD_WIDTH];
 static int invalid_pos(int y, int x)
 {
     return (y < 0 || y >= BOARD_HIGHT || x < 0 || x >= BOARD_WIDTH);
-}
-
-/* Draws the border of the board. */
-static void draw_board_border(void)
-{
-    int h; int w; tdraw_term_size(&h, &w);
-    tdraw_draw_at(BOARD_START_POS_Y(h) - 1, BOARD_START_POS_X(w) - 2, BAR_FILL C_RESET);
-    for (int i = 0; i < BOARD_HIGHT; ++i) {
-        tdraw_draw_at(BOARD_START_POS_Y(h) + i, BOARD_START_POS_X(w) - 2, BLOCK_FILL C_RESET);
-        tdraw_draw_at(BOARD_START_POS_Y(h) + i, BOARD_START_POS_X(w) + BOARD_WIDTH * 2, BLOCK_FILL C_RESET);
-    }
-    tdraw_draw_at(BOARD_START_POS_Y(h) + BOARD_HIGHT, BOARD_START_POS_X(w) - 2, BAR_FILL C_RESET);
-}
-
-/* Draws the cells of the board. */
-static void draw_board_cells(void)
-{
-    int h; int w; tdraw_term_size(&h, &w);
-    for (int row = 0; row < BOARD_HIGHT; row++) {
-        for (int col = 0; col < BOARD_WIDTH; col++) {
-            int y = row + BOARD_START_POS_Y(h);
-            int x = col * 2 + BOARD_START_POS_X(w);
-            if (board[row][col].free) {
-                tdraw_draw_at(y, x, BLOCK_EMPTY);
-            } else {
-                char* color = color_code(board[row][col].color);
-                tdraw_draw_at(y, x, "%s%s%s", color, BLOCK_FILL, C_RESET);
-            }
-        }
-    }
-}
-
-/* Clear the screen only if terminal size changed */
-static void clear_screen(void)
-{
-    static int last_h = -1; static int last_w = -1;
-    int h; int w; tdraw_term_size(&h, &w);
-    if (last_h != h || last_w != w) {
-        last_h = h; last_w = w;
-        tdraw_clear();
-    }
 }
 
 /* Returns true if the given row is full */
@@ -100,14 +53,6 @@ void board_init(void)
     }
 }
 
-void board_draw(void)
-{
-    clear_screen(); // conditional
-    draw_board_border();
-    draw_board_cells();
-    tdraw_flush();
-}
-
 void board_set(int y, int x, Color color)
 {
     if (invalid_pos(y, x)) return;
@@ -126,6 +71,12 @@ int board_is_free(int y, int x)
 {
     if (invalid_pos(y, x)) return 0;
     return board[y][x].free;
+}
+
+Color board_get_color(int y, int x)
+{
+    if (invalid_pos(y, x)) return NONE;
+    return board[y][x].color;
 }
 
 void board_clear_lines(void)
