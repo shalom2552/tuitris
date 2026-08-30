@@ -34,7 +34,7 @@ static void* input_task(void* args)
         pthread_mutex_lock(&mtx);
         switch (event) {
             case INPUT_QUIT: running = false; break;
-            case INPUT_PAUSE: g_pause = !g_pause; break;
+            case INPUT_PAUSE: if (g_pause) game_resume(); else game_pause(); break;
             case INPUT_LEFT: tetromino_move_left(); break;
             case INPUT_RIGHT: tetromino_move_right(); break;
             case INPUT_DOWN: tetromino_move_down(); break;
@@ -43,7 +43,7 @@ static void* input_task(void* args)
             case INPUT_MINUS: game_speed_down(); break;
             default: break;
         }
-        ui_draw();
+        if (!g_pause) ui_draw();
         pthread_mutex_unlock(&mtx);
     }
     return NULL;
@@ -90,8 +90,8 @@ void game_start(void)
             } else {
                 tetromino_move_down();
             }
+            ui_draw();
         }
-        ui_draw();
         pthread_mutex_unlock(&mtx);
         tdraw_delay(g_delay);
     }
@@ -102,11 +102,13 @@ void game_start(void)
 void game_pause(void)
 {
     g_pause = true;
+    ui_pause();
 }
 
 void game_resume(void)
 {
     g_pause = false;
+    tdraw_clear();
 }
 
 void game_speed_up(void)

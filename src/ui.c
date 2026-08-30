@@ -151,7 +151,13 @@ void ui_validate(void)
 
 void ui_pause(void)
 {
-
+    int h; int w; tdraw_term_size(&h, &w);
+    tdraw_draw_frame(h / 2 - 3, w / 2 - 12 , h / 2 + 3, w / 2 + 12);
+    tdraw_draw_centered_line(h / 2 - 2, "┏━┓┏━┓╻ ╻┏━┓┏━╸╺┳┓");
+    tdraw_draw_centered_line(h / 2 - 1, "┣━┛┣━┫┃ ┃┗━┓┣╸  ┃┃");
+    tdraw_draw_centered_line(h / 2 + 0, "╹  ╹ ╹┗━┛┗━┛┗━╸╺┻┛");
+    tdraw_draw_centered_line(h / 2 + 2, "Press p to continue");
+    tdraw_flush();
 }
 
 void ui_game_over(void)
