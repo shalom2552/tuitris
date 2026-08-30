@@ -57,6 +57,7 @@ void game_init(void)
     tdraw_init();
     board_init();
     state_init();
+    tetromino_init();
     srand(time(NULL));
     pthread_mutex_init(&mtx, NULL);
 }

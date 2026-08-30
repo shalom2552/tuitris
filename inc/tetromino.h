@@ -1,23 +1,23 @@
 #ifndef TETROMINO_H
 #define TETROMINO_H
 
+#include "color.h"
 #include <stdbool.h>
 
-typedef enum {
-    Straight,
-    Square,
-    T,
-    L,
-    ReverseL,
-    Z,
-    ReverseZ,
-    TETROMINO_COUNT,
-} TetrominoType;
+#define SHAPE_SIZE 4
 
-typedef struct Tetromino Tetromino;
+typedef struct { int y; int x; } Pos;
+typedef struct { Pos blocks[SHAPE_SIZE]; } Shape;
 
-/* Initialize a new tetromino with random type 
- * Returns 0 on success, 1 on failure */
+typedef struct {
+    Shape shape;
+    Color color;
+} TetrominoPeek;
+
+/* Initialize the first tetromino */
+void tetromino_init(void);
+
+/* Spawns the next tetromino, returns 0 on success, 1 on failure */
 bool tetromino_create(void);
 
 /* Moves the tetromino down one row if it can */
@@ -37,6 +37,9 @@ void tetromino_rotate_left(void);
 
 /* Returns 1 if the tetromino is locked in place, 0 otherwise */
 bool tetromino_locked(void);
+
+/* Returns peak of the next tetromino */
+TetrominoPeek tetromino_peek_next(void);
 
 #endif // !TETROMINO_H
 

@@ -8,10 +8,25 @@
 
 // === Defines ================================================================
 
-#define BLOCKS_COUNT 4
+typedef enum {
+    Straight,
+    Square,
+    T,
+    L,
+    ReverseL,
+    Z,
+    ReverseZ,
+    TETROMINO_COUNT,
+} TetrominoType;
 
-typedef struct { int y; int x; } Pos;
-typedef struct { Pos blocks[BLOCKS_COUNT]; } Shape;
+typedef struct {
+    Pos pos;
+    TetrominoType type;
+    Shape shape;
+    Color color;
+} Tetromino ;
+
+// === Variables ==============================================================
 
 // Shape position is relative to tetromino position
 static const Shape INITIAL_SHAPES[TETROMINO_COUNT] = {
@@ -34,28 +49,21 @@ static const Color TYPE_COLOR[TETROMINO_COUNT] = {
     [ReverseZ] = MAGENTA,
 };
 
-// === Variables ==============================================================
-
-struct Tetromino {
-    Pos pos;
-    TetrominoType type;
-    Shape shape;
-    Color color;
-};
 static Tetromino t;
+static Tetromino next;
 
 // === Helper Functions =======================================================
 
-/* Returns the position of the i'th block. */
+/* Returns the position of the i'th block */
 static Pos block_pos(int i)
 {
     return (Pos){ .y = t.pos.y + t.shape.blocks[i].y, .x = t.pos.x + t.shape.blocks[i].x };
 }
 
-/* Returns 1 if can place the tetromino, 0 otherwise. */
+/* Returns 1 if can place the tetromino, 0 otherwise */
 static int can_place(void)
 {
-    for (int i = 0; i < BLOCKS_COUNT; ++i) {
+    for (int i = 0; i < SHAPE_SIZE; ++i) {
         Pos p = block_pos(i);
         if (!board_is_free(p.y, p.x)) {
             return 0;
@@ -64,30 +72,30 @@ static int can_place(void)
     return 1;
 }
 
-/* Adds the tetromino to the board. */
+/* Adds the tetromino to the board */
 static bool place_tetromino(void)
 {
     if ( !can_place() ) return false;
-    for (int i = 0; i < BLOCKS_COUNT; ++i) {
+    for (int i = 0; i < SHAPE_SIZE; ++i) {
         Pos p = block_pos(i);
         board_set(p.y, p.x, t.color);
     }
     return true;
 }
 
-/* Removes the tetromino from the board. */
+/* Removes the tetromino from the board */
 static void remove_tetromino(void)
 {
-    for (int i = 0; i < BLOCKS_COUNT; ++i) {
+    for (int i = 0; i < SHAPE_SIZE; ++i) {
         Pos p = block_pos(i);
         board_remove(p.y, p.x);
     }
 }
 
-/* Returns 1 if the tetromino can move down, 0 otherwise. */
+/* Returns 1 if the tetromino can move down, 0 otherwise */
 static bool can_move(int dy, int dx)
 {
-    for (int i = 0; i < BLOCKS_COUNT; ++i) {
+    for (int i = 0; i < SHAPE_SIZE; ++i) {
         Pos p = block_pos(i);
         if (!board_is_free(p.y + dy, p.x + dx)) {
             return false;
@@ -96,6 +104,7 @@ static bool can_move(int dy, int dx)
     return true;
 }
 
+/* Move the tetromino by given delta */
 static void move(int dy, int dx)
 {
     remove_tetromino();
@@ -118,7 +127,7 @@ static void rotate_block(Pos* pos, int dir)
 /* Returns 1 if the tetromino can rotate, 0 otherwise. */
 static int can_rotate(int dir)
 {
-    for (int i = 0; i < BLOCKS_COUNT; ++i) {
+    for (int i = 0; i < SHAPE_SIZE; ++i) {
         Pos p = t.shape.blocks[i];
         rotate_block(&p, dir);
         if (!board_is_free(t.pos.y + p.y, t.pos.x + p.x)) {
@@ -133,21 +142,37 @@ static void rotate(int dir)
 {
     if (t.type == Square) return; // no-op
     if (can_rotate(dir)) {
-        for (int i = 0; i < BLOCKS_COUNT; ++i) {
+        for (int i = 0; i < SHAPE_SIZE; ++i) {
             rotate_block(&t.shape.blocks[i] , dir);
+        }
+    }
+}
+
+/* Creates the next tetromino */
+static void next_tetromino(void)
+{
+    next.pos.y = 1; next.pos.x = 4;
+    next.type = rand() % TETROMINO_COUNT;
+    next.shape = INITIAL_SHAPES[next.type];
+    next.color = TYPE_COLOR[next.type];
+    if (rand() % 2) {
+        for (int i = 0; i < SHAPE_SIZE; ++i) {
+            rotate_block(&next.shape.blocks[i], 1);
         }
     }
 }
 
 // === Public API =============================================================
 
+void tetromino_init(void)
+{
+    next_tetromino();
+}
+
 bool tetromino_create(void)
 {
-    t.pos.y = 1; t.pos.x = 4;
-    t.type = rand() % TETROMINO_COUNT;
-    t.shape = INITIAL_SHAPES[t.type];
-    t.color = TYPE_COLOR[t.type];
-    if (rand() % 2) rotate(1);
+    t = next;
+    next_tetromino();
     return place_tetromino();
 }
 
@@ -187,3 +212,12 @@ bool tetromino_locked(void)
     place_tetromino();
     return locked;
 }
+
+TetrominoPeek tetromino_peek_next(void)
+{
+    TetrominoPeek peak;
+    peak.color = next.color;
+    peak.shape = next.shape;
+    return peak;
+}
+
