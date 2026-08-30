@@ -4,19 +4,25 @@
 #include "tdraw.h"
 #include "board.h"
 
+#include <string.h>
+
 // === Defines ================================================================
 
-#define REQUIRE_HEIGHT (BOARD_HIGHT + 4)
-#define REQUIRE_WIDTH (BOARD_WIDTH * 2 + 4 + BOARD_WIDTH + 4)
+#define PANEL_WIDTH 14
+#define BOARD_HIGHT (BOARD_ROWS + 2)
+#define BOARD_WIDTH (BOARD_COLS * 2 + 2)
 
-#define BOARD_START_POS_Y(h) (((h) - BOARD_HIGHT) / 2 + 1)
-#define BOARD_START_POS_X(w) (((w) - BOARD_WIDTH * 2) / 2 + 1 - BOARD_WIDTH / 2)
+#define DRAW_START_Y(h) (((h) - BOARD_HIGHT) / 2)
+#define DRAW_START_X(w) (((w) - BOARD_WIDTH - PANEL_WIDTH) / 2)
 
 #define BLOCK_EMPTY "  "
 #define BLOCK_FILL "██"
 #define BAR_FILL "████████████████████████"
 
 // === Variables ==============================================================
+
+static int y;
+static int x;
 
 // === Helper Functions =======================================================
 
@@ -31,51 +37,73 @@ static void clear_screen(void)
     }
 }
 
-/* Draws the border of the board. */
-static void draw_board_border(int y, int x)
+/* Draws the border of the board */
+static void draw_board_border(void)
 {
-    tdraw_draw_at(y - 1, x - 2, BAR_FILL C_RESET);
-    for (int i = 0; i < BOARD_HIGHT; ++i) {
-        tdraw_draw_at(y + i, x - 2, BLOCK_FILL C_RESET);
-        tdraw_draw_at(y + i, x + BOARD_WIDTH * 2, BLOCK_FILL C_RESET);
+    tdraw_draw_at(y + 1, x + 1, BAR_FILL C_RESET);
+    for (int i = 0; i < BOARD_ROWS; ++i) {
+        tdraw_draw_at(y + 2 + i, x + 1, BLOCK_FILL C_RESET);
+        tdraw_draw_at(y + 2 + i, x + 3 + BOARD_COLS * 2, BLOCK_FILL C_RESET);
     }
-    tdraw_draw_at(y + BOARD_HIGHT, x - 2, BAR_FILL C_RESET);
+    tdraw_draw_at(y + 2 + BOARD_ROWS, x + 1, BAR_FILL C_RESET);
 }
 
-/* Draws the cells of the board. */
-static void draw_board_cells(int y, int x)
+/* Draws the cells of the board */
+static void draw_board_cells(void)
 {
-    for (int row = 0; row < BOARD_HIGHT; row++) {
-        for (int col = 0; col < BOARD_WIDTH; col++) {
+    for (int row = 0; row < BOARD_ROWS; row++) {
+        for (int col = 0; col < BOARD_COLS; col++) {
             if (board_is_free(row, col)) {
-                tdraw_draw_at(y + row, x + 2 * col, BLOCK_EMPTY);
+                tdraw_draw_at(y + 2 + row, 3 + x + 2 * col, BLOCK_EMPTY);
             } else {
                 char* color = color_code(board_get_color(row, col));
-                tdraw_draw_at(y + row, x + 2 * col, "%s%s%s", color, BLOCK_FILL, C_RESET);
+                tdraw_draw_at(y + 2 + row, 3 + x + 2 * col, "%s%s%s", color, BLOCK_FILL, C_RESET);
             }
         }
     }
+}
+
+/* Draw main frame and title */
+static void draw_frame(void)
+{
+    tdraw_draw_frame(y, x, y + BOARD_HIGHT + 1, x + BOARD_WIDTH + PANEL_WIDTH + 2);
+    // char* title = C_CYAN "Tuitris" C_RESET;
+    // int pos_x = (BOARD_WIDTH + PANEL_WIDTH) / 2 - strlen("Tuitris") / 2;
+    // tdraw_draw_at(y, x + pos_x, title);
+}
+
+/* Draw board and panel frames */
+static void draw_frames(void)
+{
+    int preview_size = PANEL_WIDTH / 2 - 2;
+    int preview_y = y + 2; int preview_x = x + BOARD_WIDTH + 4;
+    tdraw_draw_frame(preview_y, preview_x, preview_y + preview_size, preview_x + 2 * preview_size);
+    tdraw_draw_at(preview_y - 1, preview_x + 3, "Next:");
 }
 
 // === Public API =============================================================
 
 void ui_draw(void)
 {
-    clear_screen(); // conditional
     int h; int w; tdraw_term_size(&h, &w);
-    int y = BOARD_START_POS_Y(h);
-    int x = BOARD_START_POS_X(w);
+    y = DRAW_START_Y(h);
+    x = DRAW_START_X(w);
 
-    tdraw_draw_frame(y - 2, x - 3, y + BOARD_HIGHT + 1, x + 3 * BOARD_WIDTH + 2);
-    // tdraw_draw_frame(y - 2, x - 3, y + BOARD_HIGHT + 1, x + 4 * BOARD_WIDTH + 2);
-    draw_board_border(y, x);
-    draw_board_cells(y, x);
+    clear_screen();
+
+    draw_frame();
+    draw_frames();
+    draw_board_border();
+    draw_board_cells();
+
     tdraw_flush();
 }
 
 void ui_validate(void)
 {
-    while (!tdraw_term_size_ok(REQUIRE_HEIGHT, REQUIRE_WIDTH)) {
+    int require_y = BOARD_HIGHT + 2;
+    int require_x = BOARD_WIDTH + PANEL_WIDTH + 4;
+    while (!tdraw_term_size_ok(require_y, require_x)) {
         tdraw_delay(10);
     }
 }

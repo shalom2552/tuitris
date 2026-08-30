@@ -3,8 +3,8 @@
 
 #include "color.h"
 
-#define BOARD_HIGHT 20
-#define BOARD_WIDTH 10
+#define BOARD_ROWS 20
+#define BOARD_COLS 10
 
 /* Initialize an empty board */
 void board_init(void);
