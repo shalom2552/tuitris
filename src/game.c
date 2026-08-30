@@ -23,7 +23,7 @@ static void* input_task(void* args)
         InputEvent event = get_user_input(); // blocking
         pthread_mutex_lock(&mtx);
         switch (event) {
-            case INPUT_QUIT: game_end();
+            case INPUT_QUIT: game_end(); break;
             case INPUT_PAUSE: g_pause = !g_pause; break;
             case INPUT_LEFT: tetromino_move_left(); break;
             case INPUT_RIGHT: tetromino_move_right(); break;
@@ -46,11 +46,11 @@ void game_init(void)
     board_init();
 
     srand(time(NULL));
+    pthread_mutex_init(&mtx, NULL);
 }
 
 void game_start(void)
 {
-    pthread_mutex_init(&mtx, NULL);
     pthread_t tid;
     if (pthread_create(&tid, NULL, input_task, NULL) != 0) {
         exit(1);
@@ -65,7 +65,7 @@ void game_start(void)
         if (!g_pause) {
             pthread_mutex_lock(&mtx);
             if (tetromino_locked()) {
-                // board_clear_lines(); // TODO: implement
+                board_clear_lines();
                 if (!tetromino_create()) {
                     game_end();
                 }

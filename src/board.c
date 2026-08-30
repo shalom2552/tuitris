@@ -2,6 +2,8 @@
 #include "tdraw.h"
 #include "color.h"
 
+#include <stdbool.h>
+
 // === Defines ================================================================
 
 #define BLOCK_EMPTY "  "
@@ -54,7 +56,7 @@ static void draw_board_cells(void)
     }
 }
 
-/* clear the screen only if terminal size changed */
+/* Clear the screen only if terminal size changed */
 static void clear_screen(void)
 {
     static int last_h = -1; static int last_w = -1;
@@ -62,6 +64,27 @@ static void clear_screen(void)
     if (last_h != h || last_w != w) {
         last_h = h; last_w = w;
         tdraw_clear();
+    }
+}
+
+/* Returns true if the given row is full */
+static bool full_row(int row)
+{
+    for (int i = 0; i < BOARD_WIDTH; ++i) {
+        if (board_is_free(row, i)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/* Collapses the given row down with all above rows */
+static void collapse_row(int row)
+{
+    for (int i = row; i > 0; --i) {
+        for (int j = 0; j < BOARD_WIDTH; ++j) {
+            board[i][j] = board[i - 1][j];
+        }
     }
 }
 
@@ -79,9 +102,10 @@ void board_init(void)
 
 void board_draw(void)
 {
-    clear_screen();
+    clear_screen(); // conditional
     draw_board_border();
     draw_board_cells();
+    tdraw_flush();
 }
 
 void board_set(int y, int x, Color color)
@@ -102,5 +126,14 @@ int board_is_free(int y, int x)
 {
     if (invalid_pos(y, x)) return 0;
     return board[y][x].free;
+}
+
+void board_clear_lines(void)
+{
+    for (int row = 0; row < BOARD_HIGHT; ++row) {
+        if (full_row(row)) {
+            collapse_row(row);
+        }
+    }
 }
 

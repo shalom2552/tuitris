@@ -24,5 +24,8 @@ void board_remove(int y, int x);
 /* Return 1 if (x, y) is free, 0 otherwise */
 int board_is_free(int y, int x);
 
+/* Clear all lines that are full */
+void board_clear_lines(void);
+
 #endif // !BOARD_H
 
