@@ -17,23 +17,23 @@
 #define MAX_DELAY 1000 // ms
 
 // === Variables ==============================================================
-
-pthread_mutex_t mtx;
+pthread_t tid;
+pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
 atomic_int g_delay = MAX_DELAY;
-bool g_pause = false;
+atomic_bool g_pause = false;
+atomic_bool running = true;
 
 // === Helper Functions =======================================================
-
 /* Handles user input events */
 static void* input_task(void* args)
 {
     (void)args;
-    while (1) {
+    while (running) {
         InputEvent event = get_user_input(); // blocking
-        pthread_mutex_lock(&mtx);
         if (g_pause && event != INPUT_PAUSE && event != INPUT_QUIT) continue;
+        pthread_mutex_lock(&mtx);
         switch (event) {
-            case INPUT_QUIT: game_end(); break;
+            case INPUT_QUIT: running = false; break;
             case INPUT_PAUSE: g_pause = !g_pause; break;
             case INPUT_LEFT: tetromino_move_left(); break;
             case INPUT_RIGHT: tetromino_move_right(); break;
@@ -49,37 +49,44 @@ static void* input_task(void* args)
     return NULL;
 }
 
-// === Public API =============================================================
+/* Spawns next tetromino and update score */
+static void next_tetromino(void)
+{
+    int cleard = board_clear_lines();
+    state_add_score(cleard * cleard * SCORE_LINE_CLEARED);
+    if (!tetromino_create()) {
+        running = false;
+        pthread_cancel(tid);
+    }
+    state_add_score(SCORE_NEW_TETROMINO);
+}
 
+// === Public API =============================================================
 void game_init(void)
 {
-    input_init();
-    tdraw_init();
+    srand(time(NULL));
     board_init();
     state_init();
     tetromino_init();
-    srand(time(NULL));
-    pthread_mutex_init(&mtx, NULL);
+    running = true;
+    g_pause = false;
+    g_delay = MAX_DELAY;
 }
 
 void game_start(void)
 {
-    pthread_t tid;
     if (pthread_create(&tid, NULL, input_task, NULL) != 0) {
         return;
     }
 
     ui_draw();
     tetromino_create();
-    while (1) {
+    while (running) {
         ui_validate();
         pthread_mutex_lock(&mtx);
         if (!g_pause) {
             if (tetromino_locked()) {
-                board_clear_lines();
-                if (!tetromino_create()) {
-                    game_end(); break;
-                }
+                next_tetromino();
             } else {
                 tetromino_move_down();
             }
@@ -89,6 +96,7 @@ void game_start(void)
         tdraw_delay(g_delay);
     }
     pthread_join(tid, NULL);
+    game_end();
 }
 
 void game_pause(void)
@@ -118,6 +126,8 @@ int game_speed(void)
 
 void game_end(void)
 {
-    exit(0);
+    running = false;
+    state_save_max_score();
+    ui_game_over();
 }
 
