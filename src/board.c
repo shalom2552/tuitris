@@ -7,6 +7,8 @@
 #define BLOCK_EMPTY "  "
 #define BLOCK_FILL "██"
 #define BAR_FILL "████████████████████████"
+#define BOARD_START_POS_Y(h) (h - BOARD_HIGHT) / 2 + 1
+#define BOARD_START_POS_X(w) (w - BOARD_WIDTH * 2) / 2 + 1
 
 // === Globals ================================================================
 
@@ -26,14 +28,12 @@ static int invalid_pos(int y, int x)
 static void draw_board_border(void)
 {
     int h; int w; tdraw_term_size(&h, &w);
-    int top = (h - BOARD_HIGHT) / 2 + 1;
-    int left = (w - BOARD_WIDTH * 2) / 2 + 1;
-    tdraw_draw_at(top - 1, left - 2, BAR_FILL C_RESET);
+    tdraw_draw_at(BOARD_START_POS_Y(h) - 1, BOARD_START_POS_X(w) - 2, BAR_FILL C_RESET);
     for (int i = 0; i < BOARD_HIGHT; ++i) {
-        tdraw_draw_at(top + i, left - 2, BLOCK_FILL C_RESET);
-        tdraw_draw_at(top + i, left + BOARD_WIDTH * 2, BLOCK_FILL C_RESET);
+        tdraw_draw_at(BOARD_START_POS_Y(h) + i, BOARD_START_POS_X(w) - 2, BLOCK_FILL C_RESET);
+        tdraw_draw_at(BOARD_START_POS_Y(h) + i, BOARD_START_POS_X(w) + BOARD_WIDTH * 2, BLOCK_FILL C_RESET);
     }
-    tdraw_draw_at(top + BOARD_HIGHT, left - 2, BAR_FILL C_RESET);
+    tdraw_draw_at(BOARD_START_POS_Y(h) + BOARD_HIGHT, BOARD_START_POS_X(w) - 2, BAR_FILL C_RESET);
 }
 
 /* Draws the cells of the board. */
@@ -42,8 +42,8 @@ static void draw_board_cells(void)
     int h; int w; tdraw_term_size(&h, &w);
     for (int row = 0; row < BOARD_HIGHT; row++) {
         for (int col = 0; col < BOARD_WIDTH; col++) {
-            int y = row + (h - BOARD_HIGHT) / 2 + 1;
-            int x = col * 2 + (w - BOARD_WIDTH * 2) / 2 + 1;
+            int y = row + BOARD_START_POS_Y(h);
+            int x = col * 2 + BOARD_START_POS_X(w);
             if (board[row][col].free) {
                 tdraw_draw_at(y, x, BLOCK_EMPTY);
             } else {
