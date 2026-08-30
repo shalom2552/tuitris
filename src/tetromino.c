@@ -7,7 +7,6 @@
 #include <stdbool.h>
 
 // === Defines ================================================================
-
 typedef enum {
     Straight,
     Square,
@@ -27,7 +26,6 @@ typedef struct {
 } Tetromino ;
 
 // === Variables ==============================================================
-
 // Shape position is relative to tetromino position
 static const Shape INITIAL_SHAPES[TETROMINO_COUNT] = {
     [Straight] = { .blocks = { { 0, -1 }, { 0, 0 }, { 0, 1 }, { 0, 2} } },
@@ -53,7 +51,6 @@ static Tetromino t;
 static Tetromino next;
 
 // === Helper Functions =======================================================
-
 /* Returns the position of the i'th block */
 static Pos block_pos(int i)
 {
@@ -75,7 +72,7 @@ static int can_place(void)
 /* Adds the tetromino to the board */
 static bool place_tetromino(void)
 {
-    if ( !can_place() ) return false;
+    if (!can_place()) return false;
     for (int i = 0; i < SHAPE_SIZE; ++i) {
         Pos p = block_pos(i);
         board_set(p.y, p.x, t.color);
@@ -163,7 +160,6 @@ static void next_tetromino(void)
 }
 
 // === Public API =============================================================
-
 void tetromino_init(void)
 {
     next_tetromino();

@@ -22,7 +22,7 @@ int board_is_free(int y, int x);
 Color board_get_color(int y, int x);
 
 /* Clear all lines that are full */
-void board_clear_lines(void);
+int board_clear_lines(void);
 
 #endif // !BOARD_H
 

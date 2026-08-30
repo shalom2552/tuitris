@@ -2,3 +2,6 @@
 # Ignore build artifacts
 /build/*
 game
+
+# game state
+data

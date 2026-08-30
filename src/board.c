@@ -1,13 +1,10 @@
 #include "board.h"
 
 #include "color.h"
-#include "state.h"
 
 #include <stdbool.h>
 
 // === Variables ==============================================================
-
-/* Board data structure. */
 struct Cell {
     int free;
     Color color;
@@ -15,7 +12,6 @@ struct Cell {
 static struct Cell board[BOARD_ROWS][BOARD_COLS];
 
 // === Helper Functions =======================================================
-
 /* Returns 1 if the position is outside of the board */
 static int invalid_pos(int y, int x)
 {
@@ -44,7 +40,6 @@ static void collapse_row(int row)
 }
 
 // === Public API =============================================================
-
 void board_init(void)
 {
     for (int i = 0; i < BOARD_ROWS; i++) {
@@ -81,13 +76,15 @@ Color board_get_color(int y, int x)
     return board[y][x].color;
 }
 
-void board_clear_lines(void)
+int board_clear_lines(void)
 {
+    int lines_cleared = 0;
     for (int row = 0; row < BOARD_ROWS; ++row) {
         if (full_row(row)) {
+            ++lines_cleared;
             collapse_row(row);
-            state_add_score(10);
         }
     }
+    return lines_cleared;
 }
 
