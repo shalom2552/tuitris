@@ -60,7 +60,7 @@ static inline void tdraw_draw_centered_line(int y, const char* format, ...) {
     char buf[256]; va_list ap;
     va_start(ap, format); vsnprintf(buf, sizeof(buf), format, ap); va_end(ap);
     int w; tdraw_term_size(NULL, &w);
-    int len = 0; for (char* p = buf; *p; p++) if (*p == '\033') { while (*p && !isalpha(*p)) p++; } else len++;
+    int len = 0; for (char* p = buf; *p; p++) if (*p == '\033') { while (*p && !isalpha(*p)) p++; } else len += (*p & 0xC0) != 0x80;
     int x = (w - len) / 2 + 1;
     printf("\033[%d;%dH%s", y, x < 1 ? 1 : x, buf);
 }

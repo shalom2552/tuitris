@@ -7,8 +7,9 @@
 #include "state.h"
 #include "tetromino.h"
 
-// === Defines ================================================================
+#include <unistd.h>
 
+// === Defines ================================================================
 #define PANEL_WIDTH 14
 #define BOARD_HIGHT (BOARD_ROWS + 2)
 #define BOARD_WIDTH (BOARD_COLS * 2 + 2)
@@ -21,12 +22,10 @@
 #define BAR_FILL "████████████████████████"
 
 // === Variables ==============================================================
-
 static int y;
 static int x;
 
 // === Helper Functions =======================================================
-
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
@@ -123,7 +122,6 @@ static void draw_legend(void)
 }
 
 // === Public API =============================================================
-
 void ui_draw(void)
 {
     int h; int w; tdraw_term_size(&h, &w);
@@ -150,3 +148,30 @@ void ui_validate(void)
         tdraw_delay(10);
     }
 }
+
+void ui_pause(void)
+{
+
+}
+
+void ui_game_over(void)
+{
+    tdraw_clear();
+    int h; tdraw_term_size(&h, NULL);
+	tdraw_draw_centered_line(h / 2 - 6, " ██████╗  █████╗ ███╗   ███╗███████╗");
+	tdraw_draw_centered_line(h / 2 - 5, "██╔════╝ ██╔══██╗████╗ ████║██╔════╝");
+	tdraw_draw_centered_line(h / 2 - 4, "██║  ███╗███████║██╔████╔██║█████╗  ");
+	tdraw_draw_centered_line(h / 2 - 3, "██║   ██║██╔══██║██║╚██╔╝██║██╔══╝  ");
+	tdraw_draw_centered_line(h / 2 - 2, "╚██████╔╝██║  ██║██║ ╚═╝ ██║███████╗");
+	tdraw_draw_centered_line(h / 2 - 1, " ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝");
+	tdraw_draw_centered_line(h / 2 + 1, " ██████╗ ██╗   ██╗███████╗██████╗ ");
+	tdraw_draw_centered_line(h / 2 + 2, "██╔═══██╗██║   ██║██╔════╝██╔══██╗");
+	tdraw_draw_centered_line(h / 2 + 3, "██║   ██║██║   ██║█████╗  ██████╔╝");
+	tdraw_draw_centered_line(h / 2 + 4, "██║   ██║╚██╗ ██╔╝██╔══╝  ██╔══██╗");
+	tdraw_draw_centered_line(h / 2 + 5, "╚██████╔╝ ╚████╔╝ ███████╗██║  ██║");
+	tdraw_draw_centered_line(h / 2 + 6, " ╚═════╝   ╚═══╝  ╚══════╝╚═╝  ╚═╝");
+	tdraw_draw_centered_line(h / 2 + 8, "press any key...");
+    tdraw_flush();
+    getchar();
+}
+
