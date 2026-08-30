@@ -5,8 +5,7 @@
 #include "tdraw.h"
 #include "board.h"
 #include "state.h"
-
-#include <string.h>
+#include "tetromino.h"
 
 // === Defines ================================================================
 
@@ -27,6 +26,9 @@ static int y;
 static int x;
 
 // === Helper Functions =======================================================
+
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#define max(a, b) ((a) > (b) ? (a) : (b))
 
 /* Clear the screen only if terminal size changed */
 static void clear_screen(void)
@@ -76,8 +78,27 @@ static void draw_next_preview(void)
 {
     int preview_size = PANEL_WIDTH / 2 - 2;
     int preview_y = y + 2; int preview_x = x + BOARD_WIDTH + 4;
-    tdraw_draw_frame(preview_y, preview_x, preview_y + preview_size, preview_x + 2 * preview_size);
+    tdraw_draw_frame(preview_y, preview_x, preview_y + preview_size, preview_x + 2 * preview_size - 1);
     tdraw_draw_at(preview_y, preview_x + 3, "Next:");
+    TetrominoPeek peek = tetromino_peek_next();
+    int min_y = peek.shape.blocks[0].y; int max_y = min_y;
+    int min_x = peek.shape.blocks[0].x; int max_x = min_x;
+    for (int i = 0; i < SHAPE_SIZE; ++i) {
+        Pos p = peek.shape.blocks[i];
+        min_y = min(min_y, p.y); max_y = max(max_y, p.y);
+        min_x = min(min_x, p.x); max_x = max(max_x, p.x);
+    }
+    int rows = preview_size - 1;
+    int cols = 2 * preview_size - 2;
+    int pad_y = (rows - (max_y - min_y + 1)) / 2;
+    int pad_x = (cols - 2 * (max_x - min_x + 1)) / 2;
+
+    for (int i = 0; i < SHAPE_SIZE; ++i) {
+        Pos p = peek.shape.blocks[i];
+        int py = preview_y + 1 + pad_y + (p.y - min_y);
+        int px = preview_x + 1 + pad_x + 2 * (p.x - min_x);
+        tdraw_draw_at(py, px, "%s%s%s", color_code(peek.color), BLOCK_FILL, C_RESET);
+    }
 }
 
 /* Draw game state */
