@@ -1,7 +1,6 @@
 #include "board.h"
 #include "tdraw.h"
 #include "color.h"
-#include <stdio.h>
 
 // === Defines ================================================================
 
@@ -83,7 +82,6 @@ void board_draw(void)
     clear_screen();
     draw_board_border();
     draw_board_cells();
-    fflush(stdout);
 }
 
 void board_set(int y, int x, Color color)

@@ -1,6 +1,8 @@
 #ifndef TETROMINO_H
 #define TETROMINO_H
 
+#include <stdbool.h>
+
 typedef enum {
     Straight,
     Square,
@@ -16,7 +18,7 @@ typedef struct Tetromino Tetromino;
 
 /* Initialize a new tetromino with random type 
  * Returns 0 on success, 1 on failure */
-int tetromino_create(void);
+bool tetromino_create(void);
 
 /* Moves the tetromino down one row if it can */
 void tetromino_move_down(void);
@@ -34,7 +36,7 @@ void tetromino_rotate_right(void);
 void tetromino_rotate_left(void);
 
 /* Returns 1 if the tetromino is locked in place, 0 otherwise */
-int tetromino_locked(void);
+bool tetromino_locked(void);
 
 #endif // !TETROMINO_H
 

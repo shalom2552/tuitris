@@ -4,6 +4,7 @@
 #include "board.h"
 
 #include <stdlib.h>
+#include <stdbool.h>
 
 // === Defines ================================================================
 
@@ -65,16 +66,14 @@ static int can_place(void)
 }
 
 /* Adds the tetromino to the board. */
-static int place_tetromino(void)
+static bool place_tetromino(void)
 {
-    if (can_place()) {
-        for (int i = 0; i < BLOCKS_COUNT; ++i) {
-            Pos p = block_pos(i);
-            board_set(p.y, p.x, t.color);
-        }
-        return 0;
+    if ( !can_place() ) return false;
+    for (int i = 0; i < BLOCKS_COUNT; ++i) {
+        Pos p = block_pos(i);
+        board_set(p.y, p.x, t.color);
     }
-    return 1;
+    return true;
 }
 
 /* Removes the tetromino from the board. */
@@ -87,15 +86,15 @@ static void remove_tetromino(void)
 }
 
 /* Returns 1 if the tetromino can move down, 0 otherwise. */
-static int can_move(int dy, int dx)
+static bool can_move(int dy, int dx)
 {
     for (int i = 0; i < BLOCKS_COUNT; ++i) {
         Pos p = block_pos(i);
         if (!board_is_free(p.y + dy, p.x + dx)) {
-            return 0;
+            return false;
         }
     }
-    return 1;
+    return true;
 }
 
 static void move(int dy, int dx)
@@ -124,10 +123,10 @@ static int can_rotate(int dir)
         Pos p = t.shape.blocks[i];
         rotate_block(&p, dir);
         if (!board_is_free(t.pos.y + p.y, t.pos.x + p.x)) {
-            return 0;
+            return false;
         }
     }
-    return 1;
+    return true;
 }
 
 /* Rotates the tetromino around its center. */
@@ -143,7 +142,7 @@ static void rotate(int dir)
 
 // === Public API =============================================================
 
-int tetromino_create(void)
+bool tetromino_create(void)
 {
     t.pos.y = 1; t.pos.x = 4;
     t.type = rand() % TETROMINO_COUNT;
@@ -182,7 +181,7 @@ void tetromino_rotate_left(void)
     place_tetromino();
 }
 
-int tetromino_locked(void)
+bool tetromino_locked(void)
 {
     remove_tetromino();
     int locked = !can_move(1, 0);
