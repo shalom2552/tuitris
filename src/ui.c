@@ -1,8 +1,10 @@
 #include "ui.h"
 
 #include "color.h"
+#include "game.h"
 #include "tdraw.h"
 #include "board.h"
+#include "state.h"
 
 #include <string.h>
 
@@ -67,18 +69,36 @@ static void draw_board_cells(void)
 static void draw_frame(void)
 {
     tdraw_draw_frame(y, x, y + BOARD_HIGHT + 1, x + BOARD_WIDTH + PANEL_WIDTH + 2);
-    // char* title = C_CYAN "Tuitris" C_RESET;
-    // int pos_x = (BOARD_WIDTH + PANEL_WIDTH) / 2 - strlen("Tuitris") / 2;
-    // tdraw_draw_at(y, x + pos_x, title);
 }
 
 /* Draw board and panel frames */
-static void draw_frames(void)
+static void draw_next_preview(void)
 {
     int preview_size = PANEL_WIDTH / 2 - 2;
     int preview_y = y + 2; int preview_x = x + BOARD_WIDTH + 4;
     tdraw_draw_frame(preview_y, preview_x, preview_y + preview_size, preview_x + 2 * preview_size);
-    tdraw_draw_at(preview_y - 1, preview_x + 3, "Next:");
+    tdraw_draw_at(preview_y, preview_x + 3, "Next:");
+}
+
+/* Draw game state */
+static void draw_state(void)
+{
+    int state_y = y + 8; int state_x = x + BOARD_WIDTH + 4;
+    tdraw_draw_at(state_y, state_x + 2, "Score:");
+    tdraw_draw_at(state_y + 1, state_x + 2, "%06d", state_get_score());
+    tdraw_draw_at(state_y + 3, state_x + 1, "Speed: %d", game_speed());
+}
+
+/* Draw keys legend */
+static void draw_legend(void)
+{
+    int legend_y = y + 14; int legend_x = x + BOARD_WIDTH + 5;
+    tdraw_draw_at(legend_y + 1, legend_x, "Q   Quit ");
+    tdraw_draw_at(legend_y + 2, legend_x, "P   Pause");
+    tdraw_draw_at(legend_y + 3, legend_x, "R   Rotate");
+    tdraw_draw_at(legend_y + 4, legend_x, "+/- Speed");
+    tdraw_draw_at(legend_y + 5, legend_x, "←/→ Move");
+    tdraw_draw_at(legend_y + 6, legend_x, "↓   Down");
 }
 
 // === Public API =============================================================
@@ -92,7 +112,9 @@ void ui_draw(void)
     clear_screen();
 
     draw_frame();
-    draw_frames();
+    draw_state();
+    draw_legend();
+    draw_next_preview();
     draw_board_border();
     draw_board_cells();
 

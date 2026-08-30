@@ -19,6 +19,9 @@ void game_speed_up(void);
 /* Slow down the game */
 void game_speed_down(void);
 
+/* Returns current speed */
+int game_speed(void);
+
 /* End the game */
 void game_end(void);
 

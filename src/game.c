@@ -14,10 +14,12 @@
 #include <time.h>
 #include <unistd.h>
 
+#define MAX_DELAY 1000 // ms
+
 // === Variables ==============================================================
 
 pthread_mutex_t mtx;
-atomic_int g_delay = 1000; // ms
+atomic_int g_delay = MAX_DELAY;
 bool g_pause = false;
 
 // === Helper Functions =======================================================
@@ -105,7 +107,12 @@ void game_speed_up(void)
 
 void game_speed_down(void)
 {
-    g_delay = g_delay < 1000 ? g_delay + 100 : g_delay;
+    g_delay = g_delay < MAX_DELAY ? g_delay + 100 : g_delay;
+}
+
+int game_speed(void)
+{
+    return 1 + (MAX_DELAY / 100) - g_delay / 100;
 }
 
 void game_end(void)
