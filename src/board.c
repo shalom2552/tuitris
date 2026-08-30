@@ -1,5 +1,7 @@
 #include "board.h"
+
 #include "color.h"
+#include "state.h"
 
 #include <stdbool.h>
 
@@ -84,6 +86,7 @@ void board_clear_lines(void)
     for (int row = 0; row < BOARD_HIGHT; ++row) {
         if (full_row(row)) {
             collapse_row(row);
+            state_add_score(10);
         }
     }
 }

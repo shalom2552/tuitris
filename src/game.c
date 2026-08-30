@@ -1,5 +1,6 @@
 #include "game.h"
 
+#include "state.h"
 #include "board.h"
 #include "tetromino.h"
 #include "tdraw.h"
@@ -53,6 +54,7 @@ void game_init(void)
     input_init();
     tdraw_init();
     board_init();
+    state_init();
     srand(time(NULL));
     pthread_mutex_init(&mtx, NULL);
 }
