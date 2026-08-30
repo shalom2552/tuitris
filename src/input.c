@@ -51,6 +51,12 @@ InputEvent get_user_input(void)
             	return INPUT_ROTATE_CW;
 			case '\n':
 				return INPUT_SELECT;
+            case '+':
+                return INPUT_PLUS;
+            case '-':
+                return INPUT_MINUS;
+            case 'p':
+                return INPUT_PAUSE;
 			case '\033':
 				{
 					char seq[2];

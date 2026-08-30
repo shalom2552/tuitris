@@ -6,40 +6,32 @@
 #include "input.h"
 
 #include <stdatomic.h>
+#include <pthread.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
-#include <pthread.h>
+#include <unistd.h>
 
 pthread_mutex_t mtx;
-
-static void next(void)
-{
-    tetromino_move_down();
-}
+atomic_bool g_pause = false;
+atomic_int g_delay = 1000; // ms
 
 static void* input_task(void* args)
 {
     (void)args;
     while (1) {
-        InputEvent event = get_user_input();
+        InputEvent event = get_user_input(); // blocking
         pthread_mutex_lock(&mtx);
         switch (event) {
-            case INPUT_QUIT:
-                exit(0);
-            case INPUT_LEFT:
-                tetromino_move_left();
-                break;
-            case INPUT_RIGHT:
-                tetromino_move_right();
-                break;
-            case INPUT_DOWN:
-                next();
-                break;
-            case INPUT_ROTATE_CW:
-                tetromino_rotate_left();
-                break;
-            default:
-                break;
+            case INPUT_QUIT: game_end();
+            case INPUT_PAUSE: g_pause = !g_pause; break;
+            case INPUT_LEFT: tetromino_move_left(); break;
+            case INPUT_RIGHT: tetromino_move_right(); break;
+            case INPUT_DOWN: tetromino_move_down(); break;
+            case INPUT_ROTATE_CW: tetromino_rotate_right(); break;
+            case INPUT_PLUS: game_speed_up(); break;
+            case INPUT_MINUS: game_speed_down(); break;
+            default: break;
         }
         board_draw();
         pthread_mutex_unlock(&mtx);
@@ -68,20 +60,47 @@ void game_start(void)
     tetromino_create();
     while (1) {
         while (!tdraw_term_size_ok(REQUIRE_HEIGHT, REQUIRE_WIDTH)) {
-            tdraw_delay(50);
+            tdraw_delay(10);
         }
-        pthread_mutex_lock(&mtx);
-        if (tetromino_locked()) {
-            // board_clear_lines(); // TODO: implement
-            if (tetromino_create()) {
-                exit(0);
+        if (!g_pause) {
+            pthread_mutex_lock(&mtx);
+            if (tetromino_locked()) {
+                // board_clear_lines(); // TODO: implement
+                if (!tetromino_create()) {
+                    game_end();
+                }
+            } else {
+                tetromino_move_down();
             }
-        } else {
-            tetromino_move_down();
+            board_draw();
+            pthread_mutex_unlock(&mtx);
         }
-        board_draw();
-        pthread_mutex_unlock(&mtx);
-        tdraw_delay(250);
+        tdraw_delay(g_delay);
     }
+}
+
+void game_pause(void)
+{
+    g_pause = true;
+}
+
+void game_resume(void)
+{
+    g_pause = false;
+}
+
+void game_speed_up(void)
+{
+    g_delay = g_delay > 100 ? g_delay - 100 : g_delay;
+}
+
+void game_speed_down(void)
+{
+    g_delay = g_delay < 1000 ? g_delay + 100 : g_delay;
+}
+
+void game_end(void)
+{
+    exit(0);
 }
 
