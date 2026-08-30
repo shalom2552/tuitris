@@ -11,6 +11,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+static char _tdraw_buf[65536];
 
 // === Functions ==============================================================
 /* Get current terminal height and width */
@@ -92,10 +93,16 @@ static inline int tdraw_term_size_ok(int req_h, int req_w) {
 }
 
 // === Init & handlers ========================================================
+
+/* Flush the output buffer */
+static inline void tdraw_flush(void){
+    fflush(stdout);
+}
+
 /* Reset all styles and modes */
 static inline void tdraw_reset(void) {
     printf("\033[0m\033[?25h\033[?1049l");
-    fflush(stdout);
+    tdraw_flush();
 }
 
 static inline void _sig_handler(int sig) {
@@ -109,6 +116,7 @@ static inline void tdraw_init(void) {
     signal(SIGINT, _sig_handler);
     signal(SIGTERM, _sig_handler);
     atexit(tdraw_reset);
+    setvbuf(stdout, _tdraw_buf, _IOFBF, sizeof(_tdraw_buf));
     printf("\033[?1049h\033[?25l\033[H\033[J");
 }
 
