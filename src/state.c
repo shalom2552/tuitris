@@ -10,6 +10,8 @@
 // === Variables ==============================================================
 typedef struct {
     int score;
+    int lines;
+    int level;
     int max_score;
 } GameState;
 
@@ -40,7 +42,24 @@ static void load_max_score(void)
 void state_init(void)
 {
     game_state.score = 0;
+    game_state.lines = 0;
+    game_state.max_score = 0;
     load_max_score();
+}
+
+int state_score(void)
+{
+    return game_state.score;
+}
+
+int state_level(void)
+{
+    return game_state.lines / 10 + 1;
+}
+
+int state_lines(void)
+{
+    return game_state.lines;
 }
 
 void state_add_score(int score)
@@ -48,9 +67,10 @@ void state_add_score(int score)
     game_state.score += score;
 }
 
-int state_get_score(void)
+void state_add_lines(int lines)
 {
-    return game_state.score;
+    game_state.score += lines * lines * SCORE_LINE_CLEARED * state_level();
+    game_state.lines += lines;
 }
 
 int state_get_max_score(void)

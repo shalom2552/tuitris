@@ -39,8 +39,6 @@ static void* input_task(void* args)
             case INPUT_RIGHT: tetromino_move_right(); break;
             case INPUT_DOWN: tetromino_move_down(); break;
             case INPUT_ROTATE_CW: tetromino_rotate_right(); break;
-            case INPUT_PLUS: game_speed_up(); break;
-            case INPUT_MINUS: game_speed_down(); break;
             default: break;
         }
         if (!g_pause) ui_draw();
@@ -53,12 +51,13 @@ static void* input_task(void* args)
 static void next_tetromino(void)
 {
     int cleard = board_clear_lines();
-    state_add_score(cleard * cleard * SCORE_LINE_CLEARED);
+    state_add_lines(cleard);
     if (!tetromino_create()) {
         running = false;
         pthread_cancel(tid);
+    } else {
+        state_add_score(SCORE_NEW_TETROMINO);
     }
-    state_add_score(SCORE_NEW_TETROMINO);
 }
 
 // === Public API =============================================================
@@ -109,16 +108,6 @@ void game_resume(void)
 {
     g_pause = false;
     tdraw_clear();
-}
-
-void game_speed_up(void)
-{
-    g_delay = g_delay > 100 ? g_delay - 100 : g_delay;
-}
-
-void game_speed_down(void)
-{
-    g_delay = g_delay < MAX_DELAY ? g_delay + 100 : g_delay;
 }
 
 int game_speed(void)

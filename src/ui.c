@@ -1,7 +1,6 @@
 #include "ui.h"
 
 #include "color.h"
-#include "game.h"
 #include "tdraw.h"
 #include "board.h"
 #include "state.h"
@@ -69,16 +68,15 @@ static void draw_board_cells(void)
 /* Draw main frame and title */
 static void draw_frame(void)
 {
-    tdraw_draw_frame(y, x, y + BOARD_HIGHT + 1, x + BOARD_WIDTH + PANEL_WIDTH + 2);
+    tdraw_draw_frame(y, x, y + BOARD_HIGHT + 1, x + BOARD_WIDTH + PANEL_WIDTH + 3);
 }
 
 /* Draw board and panel frames */
 static void draw_next_preview(void)
 {
     int preview_size = PANEL_WIDTH / 2 - 2;
-    int preview_y = y + 2; int preview_x = x + BOARD_WIDTH + 4;
+    int preview_y = y + 1; int preview_x = x + BOARD_WIDTH + 5;
     tdraw_draw_frame(preview_y, preview_x, preview_y + preview_size, preview_x + 2 * preview_size - 1);
-    tdraw_draw_at(preview_y, preview_x + 3, "Next:");
     TetrominoPeek peek = tetromino_peek_next();
     int min_y = peek.shape.blocks[0].y; int max_y = min_y;
     int min_x = peek.shape.blocks[0].x; int max_x = min_x;
@@ -103,22 +101,29 @@ static void draw_next_preview(void)
 /* Draw game state */
 static void draw_state(void)
 {
-    int state_y = y + 8; int state_x = x + BOARD_WIDTH + 4;
-    tdraw_draw_at(state_y, state_x + 2, "Score:");
-    tdraw_draw_at(state_y + 1, state_x + 2, "%06d", state_get_score());
-    tdraw_draw_at(state_y + 3, state_x + 1, "Speed: %d", game_speed());
+    int state_y = y + 7; int state_x = x + BOARD_WIDTH + 4;
+    tdraw_draw_frame(state_y, state_x + 0, state_y + 5, state_x + 11);
+    tdraw_draw_at(state_y + 0, state_x + 1, "Score", state_score());
+    tdraw_draw_at(state_y + 1, state_x + 2, "%08d", state_score());
+    tdraw_draw_at(state_y + 2, state_x + 2, "Lvl   %02d", state_level());
+    tdraw_draw_at(state_y + 3, state_x + 3, "Lines");
+    tdraw_draw_at(state_y + 4, state_x + 3, "%05d", state_lines());
+    tdraw_draw_frame(state_y + 6, state_x + 0, state_y + 8, state_x + 11);
+    tdraw_draw_at(state_y + 6, state_x + 1, "Max Score:");
+    tdraw_draw_at(state_y + 7, state_x + 2, "%08d", state_get_max_score());
 }
 
 /* Draw keys legend */
 static void draw_legend(void)
 {
-    int legend_y = y + 14; int legend_x = x + BOARD_WIDTH + 5;
+    int legend_y = y + 16; int legend_x = x + BOARD_WIDTH + 5;
+    tdraw_draw_frame(legend_y, legend_x - 1, legend_y + 6, legend_x + 10);
+    tdraw_draw_at(legend_y, legend_x, "Keys");
     tdraw_draw_at(legend_y + 1, legend_x, "Q   Quit ");
     tdraw_draw_at(legend_y + 2, legend_x, "P   Pause");
     tdraw_draw_at(legend_y + 3, legend_x, "R   Rotate");
-    tdraw_draw_at(legend_y + 4, legend_x, "+/- Speed");
+    tdraw_draw_at(legend_y + 4, legend_x, "↓   Down");
     tdraw_draw_at(legend_y + 5, legend_x, "←/→ Move");
-    tdraw_draw_at(legend_y + 6, legend_x, "↓   Down");
 }
 
 // === Public API =============================================================
