@@ -13,8 +13,11 @@
 #define BOARD_HIGHT (BOARD_ROWS + 2)
 #define BOARD_WIDTH (BOARD_COLS * 2 + 2)
 
-#define DRAW_START_Y(h) (((h) - BOARD_HIGHT) / 2)
-#define DRAW_START_X(w) (((w) - BOARD_WIDTH - PANEL_WIDTH) / 2)
+#define FRAME_HIGHT (BOARD_HIGHT + 2)
+#define FRAME_WIDTH (BOARD_WIDTH + PANEL_WIDTH + 4)
+
+#define DRAW_START_Y(h) (((h) - FRAME_HIGHT) / 2)
+#define DRAW_START_X(w) (((w) - FRAME_WIDTH) / 2)
 
 #define BLOCK_EMPTY "  "
 #define BLOCK_FILL "██"

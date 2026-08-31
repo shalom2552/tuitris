@@ -10,6 +10,7 @@ typedef enum {
     INPUT_ROTATE_CW,
     INPUT_ROTATE_CCW,
     INPUT_PAUSE,
+    INPUT_HELP,
     INPUT_PLUS,
     INPUT_MINUS,
 	INPUT_QUIT

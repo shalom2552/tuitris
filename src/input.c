@@ -56,6 +56,7 @@ InputEvent get_user_input(void)
 			case '\n': return INPUT_SELECT;
             case '+': return INPUT_PLUS;
             case '-': return INPUT_MINUS;
+            case 'h': return INPUT_HELP;
             case 'p': return INPUT_PAUSE;
 			case '\033':
 				{

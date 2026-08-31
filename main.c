@@ -1,4 +1,5 @@
 #include "game.h"
+#include "help.h"
 #include "menu.h"
 #include "input.h"
 #include "tdraw.h"
@@ -16,7 +17,7 @@ int main(void)
                 game_start();
                 continue;
             case OPTION_HELP:
-                // help_run();
+                help_run();
                 continue;
             case OPTION_EXIT:
                 return 0;
