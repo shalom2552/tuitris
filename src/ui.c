@@ -126,8 +126,20 @@ static void draw_legend(void)
     tdraw_draw_at(legend_y + 5, legend_x, "←/→ Move");
 }
 
+/* Draws a block of equal-width lines, centered horizontally */
+static void draw_block(int top, int width, const char** lines, int count)
+{
+    int w; tdraw_term_size(NULL, &w);
+    int left = w / 2 - width / 2;
+    if (left < 1) left = 1;
+    if (top < 1) top = 1;
+    for (int i = 0; i < count; ++i) {
+        tdraw_draw_at(top + i, left, "%s", lines[i]);
+    }
+}
+
 // === Public API =============================================================
-void ui_draw(void)
+void ui_draw_game(void)
 {
     int h; int w; tdraw_term_size(&h, &w);
     y = DRAW_START_Y(h);
@@ -154,35 +166,93 @@ void ui_validate(void)
     }
 }
 
-void ui_pause(void)
+void ui_title(void)
 {
+    static const char* TITLE1[] = {
+        " ▄▄▄▄▄▄▄▄  ▄▄    ▄▄   ▄▄▄▄▄▄   ▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄     ▄▄▄▄▄▄     ▄▄▄▄   ",
+        " ▀▀▀██▀▀▀  ██    ██   ▀▀██▀▀   ▀▀▀██▀▀▀  ██▀▀▀▀██   ▀▀██▀▀   ▄█▀▀▀▀█  ",
+        "    ██     ██    ██     ██        ██     ██    ██     ██     ██▄      ",
+        "    ██     ██    ██     ██        ██     ███████      ██      ▀████▄  ",
+        "    ██     ██    ██     ██        ██     ██  ▀██▄     ██          ▀██ ",
+        "    ██     ▀██▄▄██▀   ▄▄██▄▄      ██     ██    ██   ▄▄██▄▄   █▄▄▄▄▄█▀ ",
+        "    ▀▀       ▀▀▀▀     ▀▀▀▀▀▀      ▀▀     ▀▀    ▀▀▀  ▀▀▀▀▀▀    ▀▀▀▀▀   "
+    };
+    static const char* TITLE2[] = {
+        "▗▄▄▄▖▗▖ ▗▖ ▄▄▄ ▗▄▄▄▖▗▄▄▖  ▄▄▄  ▗▄▖ ",
+        "▝▀█▀▘▐▌ ▐▌ ▀█▀ ▝▀█▀▘▐▛▀▜▌ ▀█▀ ▗▛▀▜ ",
+        "  █  ▐▌ ▐▌  █    █  ▐▌ ▐▌  █  ▐▙   ",
+        "  █  ▐▌ ▐▌  █    █  ▐███   █   ▜█▙ ",
+        "  █  ▐▌ ▐▌  █    █  ▐▌▝█▖  █     ▜▌",
+        "  █  ▝█▄█▘ ▄█▄   █  ▐▌ ▐▌ ▄█▄ ▐▄▄▟▘",
+        "  ▀   ▝▀▘  ▀▀▀   ▀  ▝▘ ▝▀ ▀▀▀  ▀▀▘ ",
+    };
+    static const char* TITLE3[] = {
+        " ▀▛▘▌ ▌▜▘▀▛▘▛▀▖▜▘▞▀▖",
+        "  ▌ ▌ ▌▐  ▌ ▙▄▘▐ ▚▄ ",
+        "  ▌ ▌ ▌▐  ▌ ▌▚ ▐ ▖ ▌",
+        "  ▘ ▝▀ ▀▘ ▘ ▘ ▘▀▘▝▀ ",
+    };
+
+
     int h; int w; tdraw_term_size(&h, &w);
-    tdraw_draw_frame(h / 2 - 3, w / 2 - 12 , h / 2 + 3, w / 2 + 12);
-    tdraw_draw_centered_line(h / 2 - 2, "┏━┓┏━┓╻ ╻┏━┓┏━╸╺┳┓");
-    tdraw_draw_centered_line(h / 2 - 1, "┣━┛┣━┫┃ ┃┗━┓┣╸  ┃┃");
-    tdraw_draw_centered_line(h / 2 + 0, "╹  ╹ ╹┗━┛┗━┛┗━╸╺┻┛");
-    tdraw_draw_centered_line(h / 2 + 2, "Press p to continue");
+
+    const char** title; int count; int width;
+    if (w >= 74 && h >= 20) {
+        title = TITLE1; count = (int)(sizeof TITLE1 / sizeof *TITLE1); width = 70;
+    } else if (w >= 39 && h >= 20) {
+        title = TITLE2; count = (int)(sizeof TITLE2 / sizeof *TITLE2); width = 35;
+    } else {
+        title = TITLE3; count = (int)(sizeof TITLE3 / sizeof *TITLE3); width = 20;
+    }
+
+    draw_block(h / 2 - 2 - count, width, title, count);
     tdraw_flush();
 }
 
+
+void ui_pause(void)
+{
+    static const char* PAUSED[] = {
+        "┏━┓┏━┓╻ ╻┏━┓┏━╸╺┳┓",
+        "┣━┛┣━┫┃ ┃┗━┓┣╸  ┃┃",
+        "╹  ╹ ╹┗━┛┗━┛┗━╸╺┻┛"
+    };
+
+    int h; int w; tdraw_term_size(&h, &w);
+    tdraw_draw_frame(h / 2 - 3, w / 2 - 12, h / 2 + 3, w / 2 + 12);
+    draw_block(h / 2 - 2, 18, PAUSED, (int)(sizeof PAUSED / sizeof *PAUSED));
+    tdraw_draw_at(h / 2 + 2, w / 2 - 9, "Press p to continue");
+    tdraw_flush();
+}
+
+
 void ui_game_over(void)
 {
+    static const char* GAME[] = {
+        " ██████╗  █████╗ ███╗   ███╗███████╗",
+        "██╔════╝ ██╔══██╗████╗ ████║██╔════╝",
+        "██║  ███╗███████║██╔████╔██║█████╗  ",
+        "██║   ██║██╔══██║██║╚██╔╝██║██╔══╝  ",
+        "╚██████╔╝██║  ██║██║ ╚═╝ ██║███████╗",
+        " ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝"
+    };
+
+    static const char* OVER[] = {
+        " ██████╗ ██╗   ██╗███████╗██████╗ ",
+        "██╔═══██╗██║   ██║██╔════╝██╔══██╗",
+        "██║   ██║██║   ██║█████╗  ██████╔╝",
+        "██║   ██║╚██╗ ██╔╝██╔══╝  ██╔══██╗",
+        "╚██████╔╝ ╚████╔╝ ███████╗██║  ██║",
+        " ╚═════╝   ╚═══╝  ╚══════╝╚═╝  ╚═╝"
+    };
+
     tdraw_clear();
-    int h; tdraw_term_size(&h, NULL);
-	tdraw_draw_centered_line(h / 2 - 6, " ██████╗  █████╗ ███╗   ███╗███████╗");
-	tdraw_draw_centered_line(h / 2 - 5, "██╔════╝ ██╔══██╗████╗ ████║██╔════╝");
-	tdraw_draw_centered_line(h / 2 - 4, "██║  ███╗███████║██╔████╔██║█████╗  ");
-	tdraw_draw_centered_line(h / 2 - 3, "██║   ██║██╔══██║██║╚██╔╝██║██╔══╝  ");
-	tdraw_draw_centered_line(h / 2 - 2, "╚██████╔╝██║  ██║██║ ╚═╝ ██║███████╗");
-	tdraw_draw_centered_line(h / 2 - 1, " ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝");
-	tdraw_draw_centered_line(h / 2 + 1, " ██████╗ ██╗   ██╗███████╗██████╗ ");
-	tdraw_draw_centered_line(h / 2 + 2, "██╔═══██╗██║   ██║██╔════╝██╔══██╗");
-	tdraw_draw_centered_line(h / 2 + 3, "██║   ██║██║   ██║█████╗  ██████╔╝");
-	tdraw_draw_centered_line(h / 2 + 4, "██║   ██║╚██╗ ██╔╝██╔══╝  ██╔══██╗");
-	tdraw_draw_centered_line(h / 2 + 5, "╚██████╔╝ ╚████╔╝ ███████╗██║  ██║");
-	tdraw_draw_centered_line(h / 2 + 6, " ╚═════╝   ╚═══╝  ╚══════╝╚═╝  ╚═╝");
-	tdraw_draw_centered_line(h / 2 + 8, "press any key...");
+    int h; int w; tdraw_term_size(&h, &w);
+    draw_block(h / 2 - 6, 36, GAME, (int)(sizeof GAME / sizeof *GAME));
+    draw_block(h / 2 + 1, 34, OVER, (int)(sizeof OVER / sizeof *OVER));
+    tdraw_draw_at(h / 2 + 8, w / 2 - 8, "press any key...");
     tdraw_flush();
     getchar();
 }
+
 

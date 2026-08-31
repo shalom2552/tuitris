@@ -5,6 +5,7 @@
 #include "tetromino.h"
 #include "tdraw.h"
 #include "input.h"
+#include "help.h"
 #include "ui.h"
 
 #include <stdatomic.h>
@@ -38,10 +39,11 @@ static void* input_task(void* args)
             case INPUT_LEFT: tetromino_move_left(); break;
             case INPUT_RIGHT: tetromino_move_right(); break;
             case INPUT_DOWN: tetromino_move_down(); break;
+            case INPUT_HELP: help_card(); break;
             case INPUT_ROTATE_CW: tetromino_rotate_right(); break;
             default: break;
         }
-        if (!g_pause) ui_draw();
+        if (!g_pause) ui_draw_game();
         pthread_mutex_unlock(&mtx);
     }
     return NULL;
@@ -78,7 +80,7 @@ void game_start(void)
         return;
     }
 
-    ui_draw();
+    ui_draw_game();
     tetromino_create();
     while (running) {
         ui_validate();
@@ -89,7 +91,7 @@ void game_start(void)
             } else {
                 tetromino_move_down();
             }
-            ui_draw();
+            ui_draw_game();
         }
         pthread_mutex_unlock(&mtx);
         tdraw_delay(g_delay);

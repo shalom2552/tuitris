@@ -3,6 +3,7 @@
 #include "color.h"
 #include "input.h"
 #include "tdraw.h"
+#include "ui.h"
 
 static int selection = 0;
 
@@ -16,6 +17,7 @@ char* menu_options[OPTION_COUNT] = {
 static void menu_draw(void)
 {
     tdraw_clear();
+    ui_title();
     int h; tdraw_term_size(&h, NULL);
     for (int i = 0; i < OPTION_COUNT; ++i) {
         if (i == selection) {
