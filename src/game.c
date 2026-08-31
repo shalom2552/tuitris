@@ -16,6 +16,7 @@
 #include <unistd.h>
 
 #define MAX_DELAY 1000 // ms
+#define MIN_DELAY 100 // ms
 
 // === Variables ==============================================================
 pthread_t tid;
@@ -62,6 +63,13 @@ static void next_tetromino(void)
     }
 }
 
+static int delay(void)
+{
+    g_delay = MAX_DELAY - 50 * (state_level() - 1);
+    g_delay = g_delay > MIN_DELAY ? g_delay : MIN_DELAY;
+    return g_delay;
+}
+
 // === Public API =============================================================
 void game_init(void)
 {
@@ -95,7 +103,7 @@ void game_start(void)
             ui_draw_game();
         }
         pthread_mutex_unlock(&mtx);
-        tdraw_delay(g_delay);
+        tdraw_delay(delay());
     }
     pthread_join(tid, NULL);
     game_end();
