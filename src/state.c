@@ -73,7 +73,7 @@ void state_add_lines(int lines)
     game_state.lines += lines;
 }
 
-int state_get_max_score(void)
+int state_max_score(void)
 {
     return game_state.max_score;
 }

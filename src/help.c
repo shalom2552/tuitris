@@ -3,7 +3,7 @@
 #include "tdraw.h"
 #include "ui.h"
 
-#define BOX_H 12
+#define BOX_H 13
 #define BOX_W 36
 
 /* Draws the help box */
@@ -16,8 +16,10 @@ static void draw_help_box(int top, int left)
     tdraw_draw_at(top + 4,  left + 5, "%s", "↓         Move down");
     tdraw_draw_at(top + 5,  left + 5, "R, Space  Rotate right");
     tdraw_draw_at(top + 6,  left + 5, "P         Pause / resume");
-    tdraw_draw_at(top + 7,  left + 5, "Q         Quit to menu");
-    tdraw_draw_at(top + 10, left + 5, "clear 10 lines to level up");
+    tdraw_draw_at(top + 7,  left + 5, "H         Show this help");
+    tdraw_draw_at(top + 8,  left + 5, "Q         Quit to menu");
+    tdraw_draw_at(top + 10, left + 5, "Clear 10 lines to level up");
+    tdraw_draw_at(top + 11, left + 5, "Speed increases every level");
     tdraw_draw_at(top + BOX_H, left + BOX_W / 2 - 8, " press any key... ");
 }
 

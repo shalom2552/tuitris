@@ -18,12 +18,14 @@ static void menu_draw(void)
 {
     tdraw_clear();
     ui_title();
-    int h; tdraw_term_size(&h, NULL);
+    int h; int w; tdraw_term_size(&h, &w);
     for (int i = 0; i < OPTION_COUNT; ++i) {
         if (i == selection) {
             tdraw_draw_at(1, 1, C_CYAN);
+            tdraw_draw_at(h / 2 + 2 * i, w / 2 - 4, "→ %s",  menu_options[i]);
+        } else {
+            tdraw_draw_at(h / 2 + 2 * i, w / 2 - 2, menu_options[i]);
         }
-        tdraw_draw_centered_line(h / 2 + 2 * i, menu_options[i]);
         tdraw_draw_at(1, 1, C_RESET);
     }
     tdraw_flush();

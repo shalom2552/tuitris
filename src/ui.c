@@ -113,7 +113,7 @@ static void draw_state(void)
     tdraw_draw_at(state_y + 4, state_x + 3, "%05d", state_lines());
     tdraw_draw_frame(state_y + 6, state_x + 0, state_y + 8, state_x + 11);
     tdraw_draw_at(state_y + 6, state_x + 1, "Max Score:");
-    tdraw_draw_at(state_y + 7, state_x + 2, "%08d", state_get_max_score());
+    tdraw_draw_at(state_y + 7, state_x + 2, "%08d", state_max_score());
 }
 
 /* Draw keys legend */
@@ -253,7 +253,10 @@ void ui_game_over(void)
     int h; int w; tdraw_term_size(&h, &w);
     draw_block(h / 2 - 6, 36, GAME, (int)(sizeof GAME / sizeof *GAME));
     draw_block(h / 2 + 1, 34, OVER, (int)(sizeof OVER / sizeof *OVER));
-    tdraw_draw_at(h / 2 + 8, w / 2 - 8, "press any key...");
+
+    tdraw_draw_centered_line(h / 2 + 8, "Score: %d", state_score());
+    tdraw_draw_centered_line(h / 2 + 9, "Max Score: %d", state_max_score());
+    tdraw_draw_centered_line(h / 2 + 11, "press any key...");
     tdraw_flush();
     getchar();
 }
