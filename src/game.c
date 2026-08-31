@@ -69,6 +69,7 @@ void game_init(void)
     board_init();
     state_init();
     tetromino_init();
+    tdraw_clear();
     running = true;
     g_pause = false;
     g_delay = MAX_DELAY;

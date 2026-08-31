@@ -5,6 +5,7 @@
 #include <stdarg.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <threads.h>
 #include <time.h>
 #include <ctype.h>
@@ -46,6 +47,11 @@ static inline void tdraw_clear(void) {
 /* Clears a given line */
 static inline void tdraw_clear_line(int y) {
     printf("\033[%d;1H\033[2K", y);
+}
+
+/* Draw an a color/style escape sequence */
+static inline void tdraw_set_color(const char* c) {
+    printf("%s", c);
 }
 
 /* Draws text at the specified position */

@@ -1,0 +1,69 @@
+#ifndef UI_ASSETS
+#define UI_ASSETS
+
+#include "color.h"
+
+#define BLOCK_EMPTY "  "
+#define BLOCK_FILL "██"
+#define BAR_FILL "████████████████████████"
+
+/* Per-letter colors of "TUITRIS" */
+#define T_T1 C_RED
+#define T_U  C_YELLOW
+#define T_I1 C_GREEN
+#define T_T2 C_CYAN
+#define T_R  C_BLUE
+#define T_I2 C_MAGENTA
+#define T_S  C_YELLOW
+
+static const char* TITLE1[] = {
+    T_T1 " ▄▄▄▄▄▄▄▄ " T_U " ▄▄    ▄▄ " T_I1 "  ▄▄▄▄▄▄  " T_T2 " ▄▄▄▄▄▄▄▄ " T_R " ▄▄▄▄▄▄   " T_I2 "  ▄▄▄▄▄▄  " T_S "   ▄▄▄▄   " C_RESET,
+    T_T1 " ▀▀▀██▀▀▀ " T_U " ██    ██ " T_I1 "  ▀▀██▀▀  " T_T2 " ▀▀▀██▀▀▀ " T_R " ██▀▀▀▀██ " T_I2 "  ▀▀██▀▀  " T_S " ▄█▀▀▀▀█  " C_RESET,
+    T_T1 "    ██    " T_U " ██    ██ " T_I1 "    ██    " T_T2 "    ██    " T_R " ██    ██ " T_I2 "    ██    " T_S " ██▄      " C_RESET,
+    T_T1 "    ██    " T_U " ██    ██ " T_I1 "    ██    " T_T2 "    ██    " T_R " ███████  " T_I2 "    ██    " T_S "  ▀████▄  " C_RESET,
+    T_T1 "    ██    " T_U " ██    ██ " T_I1 "    ██    " T_T2 "    ██    " T_R " ██  ▀██▄ " T_I2 "    ██    " T_S "      ▀██ " C_RESET,
+    T_T1 "    ██    " T_U " ▀██▄▄██▀ " T_I1 "  ▄▄██▄▄  " T_T2 "    ██    " T_R " ██    ██ " T_I2 "  ▄▄██▄▄  " T_S " █▄▄▄▄▄█▀ " C_RESET,
+    T_T1 "    ▀▀    " T_U "   ▀▀▀▀   " T_I1 "  ▀▀▀▀▀▀  " T_T2 "    ▀▀    " T_R " ▀▀    ▀▀▀" T_I2 "  ▀▀▀▀▀▀  " T_S "  ▀▀▀▀▀   " C_RESET
+};
+
+static const char* TITLE2[] = {
+    T_T1 "▗▄▄▄▖ " T_U "▗▖ ▗▖ " T_I1 "▄▄▄ " T_T2 "▗▄▄▄▖" T_R "▗▄▄▖  " T_I2 "▄▄▄ " T_S " ▗▄▖ " C_RESET,
+    T_T1 "▝▀█▀▘ " T_U "▐▌ ▐▌ " T_I1 "▀█▀ " T_T2 "▝▀█▀▘" T_R "▐▛▀▜▌ " T_I2 "▀█▀ " T_S "▗▛▀▜ " C_RESET,
+    T_T1 "  █   " T_U "▐▌ ▐▌ " T_I1 " █  " T_T2 "  █  " T_R "▐▌ ▐▌ " T_I2 " █  " T_S "▐▙   " C_RESET,
+    T_T1 "  █   " T_U "▐▌ ▐▌ " T_I1 " █  " T_T2 "  █  " T_R "▐███  " T_I2 " █  " T_S " ▜█▙ " C_RESET,
+    T_T1 "  █   " T_U "▐▌ ▐▌ " T_I1 " █  " T_T2 "  █  " T_R "▐▌▝█▖ " T_I2 " █  " T_S "   ▜▌" C_RESET,
+    T_T1 "  █   " T_U "▝█▄█▘ " T_I1 "▄█▄ " T_T2 "  █  " T_R "▐▌ ▐▌ " T_I2 "▄█▄ " T_S "▐▄▄▟▘" C_RESET,
+    T_T1 "  ▀   " T_U " ▝▀▘  " T_I1 "▀▀▀ " T_T2 "  ▀  " T_R "▝▘ ▝▀ " T_I2 "▀▀▀ " T_S " ▀▀▘ " C_RESET,
+};
+static const char* TITLE3[] = {
+    T_T1 " ▀▛▘" T_U "▌ ▌" T_I1 "▜▘" T_T2 "▀▛▘" T_R "▛▀▖" T_I2 "▜▘" T_S "▞▀▖" C_RESET,
+    T_T1 "  ▌ " T_U "▌ ▌" T_I1 "▐ " T_T2 " ▌ " T_R "▙▄▘" T_I2 "▐ " T_S "▚▄ " C_RESET,
+    T_T1 "  ▌ " T_U "▌ ▌" T_I1 "▐ " T_T2 " ▌ " T_R "▌▚ " T_I2 "▐ " T_S "▖ ▌" C_RESET,
+    T_T1 "  ▘ " T_U "▝▀ " T_I1 "▀▘" T_T2 " ▘ " T_R "▘ ▘" T_I2 "▀▘" T_S "▝▀ " C_RESET,
+};
+
+static const char* PAUSED[] = {
+    "┏━┓┏━┓╻ ╻┏━┓┏━╸╺┳┓",
+    "┣━┛┣━┫┃ ┃┗━┓┣╸  ┃┃",
+    "╹  ╹ ╹┗━┛┗━┛┗━╸╺┻┛"
+};
+
+static const char* GAME[] = {
+    " ██████╗  █████╗ ███╗   ███╗███████╗",
+    "██╔════╝ ██╔══██╗████╗ ████║██╔════╝",
+    "██║  ███╗███████║██╔████╔██║█████╗  ",
+    "██║   ██║██╔══██║██║╚██╔╝██║██╔══╝  ",
+    "╚██████╔╝██║  ██║██║ ╚═╝ ██║███████╗",
+    " ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝"
+};
+
+static const char* OVER[] = {
+    " ██████╗ ██╗   ██╗███████╗██████╗ ",
+    "██╔═══██╗██║   ██║██╔════╝██╔══██╗",
+    "██║   ██║██║   ██║█████╗  ██████╔╝",
+    "██║   ██║╚██╗ ██╔╝██╔══╝  ██╔══██╗",
+    "╚██████╔╝ ╚████╔╝ ███████╗██║  ██║",
+    " ╚═════╝   ╚═══╝  ╚══════╝╚═╝  ╚═╝"
+};
+
+#endif // !UI_ASSETS

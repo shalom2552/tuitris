@@ -10,6 +10,9 @@ void ui_validate(void);
 /* Draw game title */
 void ui_title(void);
 
+/* Draw credits line */
+void ui_credits(void);
+
 /* Draw pause screen */
 void ui_pause(void);
 

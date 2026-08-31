@@ -11,6 +11,11 @@
 #define C_CYAN "\033[36m"
 #define C_WHITE "\033[37m"
 
+#define C_DIM "\033[2m"
+#define C_BOLD "\033[1m"
+#define C_UNDERLINE "\033[4m"
+#define C_BLINK "\033[5m"
+
 typedef enum {
     NONE = 0,
     BLACK,

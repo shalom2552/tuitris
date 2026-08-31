@@ -5,6 +5,7 @@
 #include "board.h"
 #include "state.h"
 #include "tetromino.h"
+#include "ui_assets.h"
 
 #include <unistd.h>
 
@@ -16,12 +17,8 @@
 #define FRAME_HIGHT (BOARD_HIGHT + 2)
 #define FRAME_WIDTH (BOARD_WIDTH + PANEL_WIDTH + 4)
 
-#define DRAW_START_Y(h) (((h) - FRAME_HIGHT) / 2)
-#define DRAW_START_X(w) (((w) - FRAME_WIDTH) / 2)
-
-#define BLOCK_EMPTY "  "
-#define BLOCK_FILL "██"
-#define BAR_FILL "████████████████████████"
+#define DRAW_START_Y(h) (((h) - FRAME_HIGHT) / 2 + 1)
+#define DRAW_START_X(w) (((w) - FRAME_WIDTH) / 2 + 1)
 
 // === Variables ==============================================================
 static int y;
@@ -45,12 +42,12 @@ static void clear_screen(void)
 /* Draws the border of the board */
 static void draw_board_border(void)
 {
-    tdraw_draw_at(y + 1, x + 1, BAR_FILL C_RESET);
+    tdraw_draw_at(y + 1, x + 1, C_DIM C_CYAN BAR_FILL C_RESET);
     for (int i = 0; i < BOARD_ROWS; ++i) {
-        tdraw_draw_at(y + 2 + i, x + 1, BLOCK_FILL C_RESET);
-        tdraw_draw_at(y + 2 + i, x + 3 + BOARD_COLS * 2, BLOCK_FILL C_RESET);
+        tdraw_draw_at(y + 2 + i, x + 1, C_DIM C_CYAN BLOCK_FILL C_RESET);
+        tdraw_draw_at(y + 2 + i, x + 3 + BOARD_COLS * 2, C_DIM C_CYAN BLOCK_FILL C_RESET);
     }
-    tdraw_draw_at(y + 2 + BOARD_ROWS, x + 1, BAR_FILL C_RESET);
+    tdraw_draw_at(y + 2 + BOARD_ROWS, x + 1, C_DIM C_CYAN BAR_FILL C_RESET);
 }
 
 /* Draws the cells of the board */
@@ -71,15 +68,25 @@ static void draw_board_cells(void)
 /* Draw main frame and title */
 static void draw_frame(void)
 {
-    tdraw_draw_frame(y, x, y + BOARD_HIGHT + 1, x + BOARD_WIDTH + PANEL_WIDTH + 3);
+    int panel_start = x + BOARD_WIDTH + 3;
+    tdraw_set_color(C_DIM C_BLUE);
+    tdraw_draw_frame(y, x, y + BOARD_HIGHT + 1, panel_start);
+    tdraw_draw_frame(y, panel_start, y + BOARD_HIGHT + 1, panel_start + PANEL_WIDTH + 1);
+    tdraw_draw_at(y, panel_start, "┬");
+    tdraw_draw_at(y + BOARD_HIGHT + 1, panel_start, "┴");
+    tdraw_set_color(C_RESET);
+    tdraw_draw_at(y, x + 8 , C_DIM C_BLUE "<" C_RESET C_BOLD C_CYAN " TUITRIS " C_RESET C_DIM C_BLUE ">" C_RESET);
 }
 
 /* Draw board and panel frames */
 static void draw_next_preview(void)
 {
     int preview_size = PANEL_WIDTH / 2 - 2;
-    int preview_y = y + 1; int preview_x = x + BOARD_WIDTH + 5;
-    tdraw_draw_frame(preview_y, preview_x, preview_y + preview_size, preview_x + 2 * preview_size - 1);
+    int preview_y = y + 1; int preview_x = x + BOARD_WIDTH + 6;
+    tdraw_set_color(C_DIM C_BLUE);
+    tdraw_draw_frame(preview_y, preview_x - 1, preview_y + preview_size, preview_x + 2 * preview_size);
+    tdraw_set_color(C_RESET);
+    tdraw_draw_at(preview_y, preview_x + 1, C_CYAN "Next" C_RESET);
     TetrominoPeek peek = tetromino_peek_next();
     int min_y = peek.shape.blocks[0].y; int max_y = min_y;
     int min_x = peek.shape.blocks[0].x; int max_x = min_x;
@@ -104,29 +111,33 @@ static void draw_next_preview(void)
 /* Draw game state */
 static void draw_state(void)
 {
-    int state_y = y + 7; int state_x = x + BOARD_WIDTH + 4;
+    int state_y = y + 7; int state_x = x + BOARD_WIDTH + 5;
+    tdraw_set_color(C_DIM C_BLUE);
     tdraw_draw_frame(state_y, state_x + 0, state_y + 5, state_x + 11);
-    tdraw_draw_at(state_y + 0, state_x + 1, "Score", state_score());
-    tdraw_draw_at(state_y + 1, state_x + 2, "%08d", state_score());
-    tdraw_draw_at(state_y + 2, state_x + 2, "Lvl   %02d", state_level());
-    tdraw_draw_at(state_y + 3, state_x + 3, "Lines");
-    tdraw_draw_at(state_y + 4, state_x + 3, "%05d", state_lines());
     tdraw_draw_frame(state_y + 6, state_x + 0, state_y + 8, state_x + 11);
-    tdraw_draw_at(state_y + 6, state_x + 1, "Max Score:");
-    tdraw_draw_at(state_y + 7, state_x + 2, "%08d", state_max_score());
+    tdraw_set_color(C_RESET);
+    tdraw_draw_at(state_y + 0, state_x + 1, C_CYAN "Score" C_RESET);
+    tdraw_draw_at(state_y + 1, state_x + 2, C_BOLD "%08d" C_RESET, state_score());
+    tdraw_draw_at(state_y + 2, state_x + 2, C_DIM "Lvl.  " C_RESET C_BOLD "%02d" C_RESET, state_level());
+    tdraw_draw_at(state_y + 3, state_x + 3, C_CYAN "Lines" C_RESET);
+    tdraw_draw_at(state_y + 4, state_x + 3, C_BOLD "%05d" C_RESET, state_lines());
+    tdraw_draw_at(state_y + 6, state_x + 1, C_CYAN "Max Score" C_RESET);
+    tdraw_draw_at(state_y + 7, state_x + 2, C_BOLD C_MAGENTA "%08d" C_RESET, state_max_score());
 }
 
 /* Draw keys legend */
 static void draw_legend(void)
 {
-    int legend_y = y + 16; int legend_x = x + BOARD_WIDTH + 5;
+    int legend_y = y + 16; int legend_x = x + BOARD_WIDTH + 6;
+    tdraw_set_color(C_DIM C_BLUE);
     tdraw_draw_frame(legend_y, legend_x - 1, legend_y + 6, legend_x + 10);
-    tdraw_draw_at(legend_y, legend_x, "Keys");
-    tdraw_draw_at(legend_y + 1, legend_x, "Q   Quit ");
-    tdraw_draw_at(legend_y + 2, legend_x, "P   Pause");
-    tdraw_draw_at(legend_y + 3, legend_x, "R   Rotate");
-    tdraw_draw_at(legend_y + 4, legend_x, "↓   Down");
-    tdraw_draw_at(legend_y + 5, legend_x, "←/→ Move");
+    tdraw_set_color(C_RESET);
+    tdraw_draw_at(legend_y, legend_x, C_CYAN "Keys" C_RESET);
+    tdraw_draw_at(legend_y + 1, legend_x, C_MAGENTA"←/→ "C_RESET C_DIM "Move"C_RESET);
+    tdraw_draw_at(legend_y + 2, legend_x, C_MAGENTA"↓   "C_RESET C_DIM "Down"C_RESET);
+    tdraw_draw_at(legend_y + 3, legend_x, C_MAGENTA"R   "C_RESET C_DIM "Rotat"C_RESET);
+    tdraw_draw_at(legend_y + 4, legend_x, C_MAGENTA"P   "C_RESET C_DIM "Pause"C_RESET);
+    tdraw_draw_at(legend_y + 5, legend_x, C_MAGENTA"Q   "C_RESET C_DIM "Quit "C_RESET);
 }
 
 /* Draws a block of equal-width lines, centered horizontally */
@@ -149,21 +160,19 @@ void ui_draw_game(void)
     x = DRAW_START_X(w);
 
     clear_screen();
-
     draw_frame();
     draw_state();
     draw_legend();
     draw_next_preview();
     draw_board_border();
     draw_board_cells();
-
     tdraw_flush();
 }
 
 void ui_validate(void)
 {
-    int require_y = BOARD_HIGHT + 2;
-    int require_x = BOARD_WIDTH + PANEL_WIDTH + 4;
+    int require_y = BOARD_HIGHT + 4;
+    int require_x = BOARD_WIDTH + PANEL_WIDTH + 8;
     while (!tdraw_term_size_ok(require_y, require_x)) {
         tdraw_delay(10);
     }
@@ -171,32 +180,6 @@ void ui_validate(void)
 
 void ui_title(void)
 {
-    static const char* TITLE1[] = {
-        " ▄▄▄▄▄▄▄▄  ▄▄    ▄▄   ▄▄▄▄▄▄   ▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄     ▄▄▄▄▄▄     ▄▄▄▄   ",
-        " ▀▀▀██▀▀▀  ██    ██   ▀▀██▀▀   ▀▀▀██▀▀▀  ██▀▀▀▀██   ▀▀██▀▀   ▄█▀▀▀▀█  ",
-        "    ██     ██    ██     ██        ██     ██    ██     ██     ██▄      ",
-        "    ██     ██    ██     ██        ██     ███████      ██      ▀████▄  ",
-        "    ██     ██    ██     ██        ██     ██  ▀██▄     ██          ▀██ ",
-        "    ██     ▀██▄▄██▀   ▄▄██▄▄      ██     ██    ██   ▄▄██▄▄   █▄▄▄▄▄█▀ ",
-        "    ▀▀       ▀▀▀▀     ▀▀▀▀▀▀      ▀▀     ▀▀    ▀▀▀  ▀▀▀▀▀▀    ▀▀▀▀▀   "
-    };
-    static const char* TITLE2[] = {
-        "▗▄▄▄▖▗▖ ▗▖ ▄▄▄ ▗▄▄▄▖▗▄▄▖  ▄▄▄  ▗▄▖ ",
-        "▝▀█▀▘▐▌ ▐▌ ▀█▀ ▝▀█▀▘▐▛▀▜▌ ▀█▀ ▗▛▀▜ ",
-        "  █  ▐▌ ▐▌  █    █  ▐▌ ▐▌  █  ▐▙   ",
-        "  █  ▐▌ ▐▌  █    █  ▐███   █   ▜█▙ ",
-        "  █  ▐▌ ▐▌  █    █  ▐▌▝█▖  █     ▜▌",
-        "  █  ▝█▄█▘ ▄█▄   █  ▐▌ ▐▌ ▄█▄ ▐▄▄▟▘",
-        "  ▀   ▝▀▘  ▀▀▀   ▀  ▝▘ ▝▀ ▀▀▀  ▀▀▘ ",
-    };
-    static const char* TITLE3[] = {
-        " ▀▛▘▌ ▌▜▘▀▛▘▛▀▖▜▘▞▀▖",
-        "  ▌ ▌ ▌▐  ▌ ▙▄▘▐ ▚▄ ",
-        "  ▌ ▌ ▌▐  ▌ ▌▚ ▐ ▖ ▌",
-        "  ▘ ▝▀ ▀▘ ▘ ▘ ▘▀▘▝▀ ",
-    };
-
-
     int h; int w; tdraw_term_size(&h, &w);
 
     const char** title; int count; int width;
@@ -213,50 +196,38 @@ void ui_title(void)
 }
 
 
+void ui_credits(void)
+{
+    int h; tdraw_term_size(&h, NULL);
+    tdraw_draw_centered_line(h - 2, C_DIM "made by shalom2552 | github.com/shalom2552/tuitris" C_RESET);
+}
+
+
 void ui_pause(void)
 {
-    static const char* PAUSED[] = {
-        "┏━┓┏━┓╻ ╻┏━┓┏━╸╺┳┓",
-        "┣━┛┣━┫┃ ┃┗━┓┣╸  ┃┃",
-        "╹  ╹ ╹┗━┛┗━┛┗━╸╺┻┛"
-    };
-
     int h; int w; tdraw_term_size(&h, &w);
+    tdraw_set_color(C_DIM C_BLUE);
     tdraw_draw_frame(h / 2 - 3, w / 2 - 12, h / 2 + 3, w / 2 + 12);
+    tdraw_set_color(C_BOLD C_CYAN);
     draw_block(h / 2 - 2, 18, PAUSED, (int)(sizeof PAUSED / sizeof *PAUSED));
-    tdraw_draw_at(h / 2 + 2, w / 2 - 9, "Press p to continue");
+    tdraw_set_color(C_RESET);
+    tdraw_draw_at(h / 2 + 2, w / 2 - 9, C_DIM"Press p to continue"C_RESET);
     tdraw_flush();
 }
 
 
 void ui_game_over(void)
 {
-    static const char* GAME[] = {
-        " ██████╗  █████╗ ███╗   ███╗███████╗",
-        "██╔════╝ ██╔══██╗████╗ ████║██╔════╝",
-        "██║  ███╗███████║██╔████╔██║█████╗  ",
-        "██║   ██║██╔══██║██║╚██╔╝██║██╔══╝  ",
-        "╚██████╔╝██║  ██║██║ ╚═╝ ██║███████╗",
-        " ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝"
-    };
-
-    static const char* OVER[] = {
-        " ██████╗ ██╗   ██╗███████╗██████╗ ",
-        "██╔═══██╗██║   ██║██╔════╝██╔══██╗",
-        "██║   ██║██║   ██║█████╗  ██████╔╝",
-        "██║   ██║╚██╗ ██╔╝██╔══╝  ██╔══██╗",
-        "╚██████╔╝ ╚████╔╝ ███████╗██║  ██║",
-        " ╚═════╝   ╚═══╝  ╚══════╝╚═╝  ╚═╝"
-    };
-
     tdraw_clear();
     int h; int w; tdraw_term_size(&h, &w);
+    tdraw_set_color(C_BOLD C_RED);
     draw_block(h / 2 - 6, 36, GAME, (int)(sizeof GAME / sizeof *GAME));
     draw_block(h / 2 + 1, 34, OVER, (int)(sizeof OVER / sizeof *OVER));
+    tdraw_set_color(C_RESET);
 
-    tdraw_draw_centered_line(h / 2 + 8, "Score: %d", state_score());
-    tdraw_draw_centered_line(h / 2 + 9, "Max Score: %d", state_max_score());
-    tdraw_draw_centered_line(h / 2 + 11, "press any key...");
+    tdraw_draw_centered_line(h / 2 + 8, C_CYAN "Score: " C_RESET C_BOLD "%d"C_RESET, state_score());
+    tdraw_draw_centered_line(h / 2 + 9, C_CYAN "Max Score: " C_BOLD C_MAGENTA "%d"C_RESET, state_max_score());
+    tdraw_draw_centered_line(h / 2 + 11, C_DIM"press any key..."C_RESET);
     tdraw_flush();
     getchar();
 }
