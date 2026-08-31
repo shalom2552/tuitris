@@ -3,6 +3,13 @@
 Tetris in the terminal, written in C with no external libraries, rendering is raw
 ANSI escape sequences, raw-mode input, and the game loop runs on pthreads.
 
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="68%"><img src="share/menu.png" width="100%"></td>
+<td width="32%"><img src="share/gameplay.png" width="100%"></td>
+</tr>
+</table>
+
 ## Requirements
 
 - gcc and make
