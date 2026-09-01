@@ -89,7 +89,7 @@ static void remove_tetromino(void)
     }
 }
 
-/* Returns 1 if the tetromino can move down, 0 otherwise */
+/* Returns 1 if the tetromino can move by delta, 0 otherwise */
 static bool can_move(int dy, int dx)
 {
     for (int i = 0; i < SHAPE_SIZE; ++i) {
