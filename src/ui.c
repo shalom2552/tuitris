@@ -122,8 +122,9 @@ static void draw_state(void)
     tdraw_draw_at(state_y + 2, state_x + 2, C_DIM "Lvl.  " C_RESET C_BOLD "%02d" C_RESET, state_level());
     tdraw_draw_at(state_y + 3, state_x + 3, C_CYAN "Lines" C_RESET);
     tdraw_draw_at(state_y + 4, state_x + 3, C_BOLD "%05d" C_RESET, state_lines());
-    tdraw_draw_at(state_y + 6, state_x + 1, C_CYAN "Max Score" C_RESET);
-    tdraw_draw_at(state_y + 7, state_x + 2, C_BOLD C_MAGENTA "%08d" C_RESET, state_max_score());
+    tdraw_draw_at(state_y + 6, state_x + 1, C_CYAN "High-Score" C_RESET);
+    tdraw_draw_at(state_y + 6, state_x + 1, C_CYAN "High-Score" C_RESET);
+    tdraw_draw_at(state_y + 7, state_x + 2, C_BOLD C_MAGENTA "%08d" C_RESET, state_high_score());
 }
 
 /* Draw keys legend */
@@ -210,7 +211,7 @@ void ui_pause(void)
     tdraw_set_color(C_DIM C_BLUE);
     tdraw_draw_frame(h / 2 - 3, w / 2 - 12, h / 2 + 3, w / 2 + 12);
     tdraw_set_color(C_BOLD C_CYAN);
-    draw_block(h / 2 - 2, 18, PAUSED, (int)(sizeof PAUSED / sizeof *PAUSED));
+    draw_block(h / 2 - 2, 18, ASCII_PAUSED, (int)(sizeof ASCII_PAUSED / sizeof *ASCII_PAUSED));
     tdraw_set_color(C_RESET);
     tdraw_draw_at(h / 2 + 2, w / 2 - 9, C_DIM"Press p to continue"C_RESET);
     tdraw_flush();
@@ -221,13 +222,19 @@ void ui_game_over(void)
 {
     tdraw_clear();
     int h; int w; tdraw_term_size(&h, &w);
-    tdraw_set_color(C_BOLD C_RED);
-    draw_block(h / 2 - 6, 36, GAME, (int)(sizeof GAME / sizeof *GAME));
-    draw_block(h / 2 + 1, 34, OVER, (int)(sizeof OVER / sizeof *OVER));
+    if (state_score() == state_high_score()) { // High Score
+        tdraw_set_color(C_BOLD C_GREEN);
+        draw_block(h / 2 - 6, 28, ASCII_HIGH, (int)(sizeof ASCII_HIGH / sizeof *ASCII_HIGH));
+        draw_block(h / 2 + 1, 41, ASCII_SCORE, (int)(sizeof ASCII_SCORE / sizeof *ASCII_SCORE));
+    } else { // Game Over
+        tdraw_set_color(C_BOLD C_RED);
+        draw_block(h / 2 - 6, 36, ASCII_GAME, (int)(sizeof ASCII_GAME / sizeof *ASCII_GAME));
+        draw_block(h / 2 + 1, 34, ASCII_OVER, (int)(sizeof ASCII_OVER / sizeof *ASCII_OVER));
+    }
     tdraw_set_color(C_RESET);
 
-    tdraw_draw_centered_line(h / 2 + 8, C_CYAN "Score: " C_RESET C_BOLD "%d"C_RESET, state_score());
-    tdraw_draw_centered_line(h / 2 + 9, C_CYAN "Max Score: " C_BOLD C_MAGENTA "%d"C_RESET, state_max_score());
+    tdraw_draw_at(h / 2 + 8, w / 2 - 6, C_CYAN "Score: " C_RESET C_BOLD "%d"C_RESET, state_score());
+    tdraw_draw_at(h / 2 + 9, w / 2 - 11, C_CYAN "High-Score: " C_BOLD C_MAGENTA "%d"C_RESET, state_high_score());
     tdraw_draw_centered_line(h / 2 + 11, C_DIM"press ENTER to continue..."C_RESET);
     tdraw_flush();
     InputEvent event = get_user_input(); // continue on ENTER only

@@ -23,10 +23,10 @@ void state_add_score(int score);
 void state_add_lines(int lines);
 
 /* Get max score from previous games */
-int state_max_score(void);
+int state_high_score(void);
 
 /* Save the max score to the file */
-void state_save_max_score(void);
+void state_save_high_score(void);
 
 #endif // !STATS_H
 
