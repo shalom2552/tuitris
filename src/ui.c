@@ -6,6 +6,7 @@
 #include "state.h"
 #include "tetromino.h"
 #include "ui_assets.h"
+#include "input.h"
 
 #include <unistd.h>
 
@@ -227,9 +228,10 @@ void ui_game_over(void)
 
     tdraw_draw_centered_line(h / 2 + 8, C_CYAN "Score: " C_RESET C_BOLD "%d"C_RESET, state_score());
     tdraw_draw_centered_line(h / 2 + 9, C_CYAN "Max Score: " C_BOLD C_MAGENTA "%d"C_RESET, state_max_score());
-    tdraw_draw_centered_line(h / 2 + 11, C_DIM"press any key..."C_RESET);
+    tdraw_draw_centered_line(h / 2 + 11, C_DIM"press ENTER to continue..."C_RESET);
     tdraw_flush();
-    getchar();
+    InputEvent event = get_user_input(); // continue on ENTER only
+    while (event != INPUT_SELECT) { event = get_user_input(); }
 }
 
 

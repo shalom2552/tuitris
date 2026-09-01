@@ -11,7 +11,6 @@
 typedef struct {
     int score;
     int lines;
-    int level;
     int max_score;
 } GameState;
 
