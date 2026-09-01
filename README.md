@@ -1,7 +1,7 @@
 # Tuitris
 
-Tetris in the terminal, written in C with no external libraries, rendering is raw
-ANSI escape sequences, raw-mode input, and the game loop runs on pthreads.
+Tetris clone TUI for the terminal. Written in pure C with no external libraries, rendering is raw ANSI escape sequences, raw-mode input with alt-screen, pthreads for the game loop, and no memory allocations.
+
 
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
 <tr>
