@@ -4,9 +4,10 @@
 #include "tdraw.h"
 #include "board.h"
 #include "state.h"
+#include "input.h"
+#include "menu.h"
 #include "tetromino.h"
 #include "ui_assets.h"
-#include "input.h"
 
 #include <unistd.h>
 
@@ -155,6 +156,37 @@ static void draw_block(int top, int width, const char** lines, int count)
 }
 
 // === Public API =============================================================
+void ui_validate(void)
+{
+    int require_y = BOARD_HIGHT + 4;
+    int require_x = BOARD_WIDTH + PANEL_WIDTH + 8;
+    while (!tdraw_term_size_ok(require_y, require_x)) {
+        tdraw_delay(10);
+    }
+}
+
+/* Draw the menu */
+void ui_draw_menu(int selection)
+{
+    ui_validate();
+    tdraw_clear();
+    ui_title();
+    ui_subtitle();
+    int h; int w; tdraw_term_size(&h, &w);
+    int top = h / 2 + 2;
+    for (int i = 0; i < OPTION_COUNT; ++i) {
+        if (i == selection) {
+            tdraw_draw_at(1, 1, C_BOLD C_CYAN);
+            tdraw_draw_at(top + 2 * i, w / 2 - 4, "→ %s",  menu_options[i]);
+        } else {
+            tdraw_draw_at(top + 2 * i, w / 2 - 2, C_DIM "%s", menu_options[i]);
+        }
+        tdraw_draw_at(1, 1, C_RESET);
+    }
+    ui_credits();
+    tdraw_flush();
+}
+
 void ui_draw_game(void)
 {
     int h; int w; tdraw_term_size(&h, &w);
@@ -169,15 +201,6 @@ void ui_draw_game(void)
     draw_board_border();
     draw_board_cells();
     tdraw_flush();
-}
-
-void ui_validate(void)
-{
-    int require_y = BOARD_HIGHT + 4;
-    int require_x = BOARD_WIDTH + PANEL_WIDTH + 8;
-    while (!tdraw_term_size_ok(require_y, require_x)) {
-        tdraw_delay(10);
-    }
 }
 
 void ui_title(void)
