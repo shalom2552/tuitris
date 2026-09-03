@@ -28,5 +28,8 @@ unsigned int state_high_score(void);
 /* Save the max score to the file */
 void state_save_high_score(void);
 
+/* Reset the high score vlaue */
+void state_reset_high_score(void);
+
 #endif // !STATS_H
 

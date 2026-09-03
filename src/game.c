@@ -128,7 +128,7 @@ int game_speed(void)
 
 void game_end(void)
 {
-    state_save_high_score();
     ui_game_over();
+    state_save_high_score();
 }
 

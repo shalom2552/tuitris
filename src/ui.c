@@ -227,7 +227,6 @@ void ui_credits(void)
     tdraw_draw_centered_line(h - 2, C_DIM "made by shalom2552 | github.com/shalom2552/tuitris" C_RESET);
 }
 
-
 void ui_pause(void)
 {
     int h; int w; tdraw_term_size(&h, &w);
@@ -240,12 +239,11 @@ void ui_pause(void)
     tdraw_flush();
 }
 
-
 void ui_game_over(void)
 {
     tdraw_clear();
     int h; int w; tdraw_term_size(&h, &w);
-    if (state_score() == state_high_score()) { // High Score
+    if (state_score() > state_high_score()) { // High Score
         tdraw_set_color(C_BOLD C_GREEN);
         draw_block(h / 2 - 6, 28, ASCII_HIGH, (int)(sizeof ASCII_HIGH / sizeof *ASCII_HIGH));
         draw_block(h / 2 + 1, 41, ASCII_SCORE, (int)(sizeof ASCII_SCORE / sizeof *ASCII_SCORE));
@@ -264,4 +262,33 @@ void ui_game_over(void)
     while (event != INPUT_SELECT) { event = get_user_input(); }
 }
 
+int ui_confirm(const char* msg) {
+    int h; int w; tdraw_term_size(&h, &w);
+    tdraw_clear();
+    tdraw_set_color(C_BOLD C_BLUE);
+    tdraw_draw_frame(h / 2 - 3, w / 2 - 20, h / 2 + 3, w / 2 + 21);
+    tdraw_draw_centered_line(h / 2 - 1, msg);
+    tdraw_set_color(C_RESET C_DIM);
+    tdraw_draw_centered_line(h / 2 + 1, "[N/y]");
+    tdraw_set_color(C_RESET);
+    tdraw_flush();
+    tdraw_clear();
+    char c = getchar();
+    return c == 'y';
+}
+
+void ui_message(const char* msg)
+{
+    int h; int w; tdraw_term_size(&h, &w);
+    tdraw_clear();
+    tdraw_set_color(C_BOLD C_GREEN);
+    tdraw_draw_frame(h / 2 - 3, w / 2 - 20, h / 2 + 3, w / 2 + 21);
+    tdraw_draw_centered_line(h / 2 - 1, msg);
+    tdraw_set_color(C_RESET C_DIM);
+    tdraw_draw_centered_line(h / 2 + 1, "Press any key");
+    tdraw_set_color(C_RESET);
+    tdraw_flush();
+    tdraw_clear();
+    getchar();
+}
 

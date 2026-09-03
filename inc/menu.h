@@ -4,6 +4,7 @@
 typedef enum {
     OPTION_START,
     OPTION_HELP,
+    OPTION_RESET,
     OPTION_EXIT,
     OPTION_COUNT
 } MenuOption;

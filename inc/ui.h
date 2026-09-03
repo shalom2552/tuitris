@@ -19,4 +19,10 @@ void ui_pause(void);
 /* Draw game over screen */
 void ui_game_over(void);
 
+/* Draw a confirmation dialog */
+int ui_confirm(const char* msg);
+
+/* Draw a floating message box */
+void ui_message(const char* msg);
+
 #endif // !UI_H

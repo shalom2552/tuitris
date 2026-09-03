@@ -8,6 +8,7 @@ static int selection = 0;
 char* menu_options[OPTION_COUNT] = {
     "START",
     "HELP",
+    "RESET",
     "EXIT"
 };
 

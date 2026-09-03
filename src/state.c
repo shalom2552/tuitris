@@ -90,3 +90,10 @@ void state_save_high_score(void)
     save_high_score();
 }
 
+void state_reset_high_score(void)
+{
+    game_state.high_score = 0;
+    save_high_score();
+    s_max_score_loaded = 0;
+}
+
