@@ -220,11 +220,19 @@ void ui_title(void)
     tdraw_flush();
 }
 
+void ui_subtitle(void)
+{
+    int h; tdraw_term_size(&h, NULL);
+    tdraw_set_color(C_DIM);
+    tdraw_draw_centered_line(h - 4, "High Score: %u", state_high_score());
+    tdraw_set_color(C_RESET);
+    tdraw_flush();
+}
 
 void ui_credits(void)
 {
     int h; tdraw_term_size(&h, NULL);
-    tdraw_draw_centered_line(h - 2, C_DIM "made by shalom2552 | github.com/shalom2552/tuitris" C_RESET);
+    tdraw_draw_centered_line(h - 2, C_DIM DEV_CREDIT C_RESET);
 }
 
 void ui_pause(void)

@@ -7,6 +7,8 @@
 #define BLOCK_FILL "██"
 #define BAR_FILL "████████████████████████"
 
+#define DEV_CREDIT "made by shalom2552 | github.com/shalom2552/tuitris"
+
 /* Per-letter colors of "TUITRIS" */
 #define T_T1 C_RED
 #define T_U  C_YELLOW
@@ -83,4 +85,6 @@ static const char* ASCII_SCORE[] = {
     "███████║╚██████╗╚██████╔╝██║  ██║███████╗",
     "╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝",
 };
+
 #endif // !UI_ASSETS
+
