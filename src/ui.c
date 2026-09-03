@@ -272,7 +272,6 @@ void ui_game_over(void)
 
 int ui_confirm(const char* msg) {
     int h; int w; tdraw_term_size(&h, &w);
-    tdraw_clear();
     tdraw_set_color(C_BOLD C_BLUE);
     tdraw_draw_frame(h / 2 - 3, w / 2 - 20, h / 2 + 3, w / 2 + 21);
     tdraw_draw_centered_line(h / 2 - 1, msg);
@@ -280,7 +279,6 @@ int ui_confirm(const char* msg) {
     tdraw_draw_centered_line(h / 2 + 1, "[N/y]");
     tdraw_set_color(C_RESET);
     tdraw_flush();
-    tdraw_clear();
     char c = getchar();
     return c == 'y';
 }
@@ -288,7 +286,6 @@ int ui_confirm(const char* msg) {
 void ui_message(const char* msg)
 {
     int h; int w; tdraw_term_size(&h, &w);
-    tdraw_clear();
     tdraw_set_color(C_BOLD C_GREEN);
     tdraw_draw_frame(h / 2 - 3, w / 2 - 20, h / 2 + 3, w / 2 + 21);
     tdraw_draw_centered_line(h / 2 - 1, msg);
@@ -296,7 +293,6 @@ void ui_message(const char* msg)
     tdraw_draw_centered_line(h / 2 + 1, "Press any key");
     tdraw_set_color(C_RESET);
     tdraw_flush();
-    tdraw_clear();
     getchar();
 }
 
