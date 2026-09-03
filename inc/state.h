@@ -8,13 +8,13 @@
 void state_init(void);
 
 /* Get the current score */
-int state_score(void);
+unsigned int state_score(void);
 
 /* Get the current level */
-int state_level(void);
+unsigned int state_level(void);
 
 /* Get the total lines cleared */
-int state_lines(void);
+unsigned int state_lines(void);
 
 /* Add score to the game state */
 void state_add_score(int score);
@@ -23,7 +23,7 @@ void state_add_score(int score);
 void state_add_lines(int lines);
 
 /* Get max score from previous games */
-int state_high_score(void);
+unsigned int state_high_score(void);
 
 /* Save the max score to the file */
 void state_save_high_score(void);
