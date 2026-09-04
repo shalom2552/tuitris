@@ -85,10 +85,10 @@ static inline void tdraw_draw_frame(int y1, int x1, int y2, int x2) {
         tdraw_draw_at(y1, i, "─");
         tdraw_draw_at(y2, i, "─");
     }
-    tdraw_draw_at(y1, x1, "┌");
-    tdraw_draw_at(y1, x2, "┐");
-    tdraw_draw_at(y2, x1, "└");
-    tdraw_draw_at(y2, x2, "┘");
+    tdraw_draw_at(y1, x1, "╭");
+    tdraw_draw_at(y1, x2, "╮");
+    tdraw_draw_at(y2, x1, "╰");
+    tdraw_draw_at(y2, x2, "╯");
 }
 
 // === Utils ==================================================================
