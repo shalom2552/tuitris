@@ -173,7 +173,7 @@ void ui_draw_menu(int selection)
     ui_title();
     ui_subtitle();
     int h; int w; tdraw_term_size(&h, &w);
-    int top = h / 2 + 2;
+    int top = h / 2 + 1;
     for (int i = 0; i < OPTION_COUNT; ++i) {
         if (i == selection) {
             tdraw_draw_at(1, 1, C_BOLD C_CYAN);
@@ -266,8 +266,8 @@ void ui_game_over(void)
     tdraw_draw_at(h / 2 + 9, w / 2 - 11, C_CYAN "High-Score: " C_BOLD C_MAGENTA "%d"C_RESET, state_high_score());
     tdraw_draw_centered_line(h / 2 + 11, C_DIM"press ENTER to continue..."C_RESET);
     tdraw_flush();
-    InputEvent event = get_user_input(); // continue on ENTER only
-    while (event != INPUT_SELECT) { event = get_user_input(); }
+    InputEvent event = get_user_input(); // continue on ENTER or QUIT only
+    while (event != INPUT_SELECT && event != INPUT_QUIT) { event = get_user_input(); }
 }
 
 int ui_confirm(const char* msg) {
