@@ -7,7 +7,7 @@ void ui_validate(void);
 /* Draw menu screen */
 void ui_draw_menu(int selection);
 
-/* Main ui function */
+/* Draw game screen */
 void ui_draw_game(void);
 
 /* Draw game title */

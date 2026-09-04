@@ -23,7 +23,7 @@ pthread_t tid;
 pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
 atomic_int g_delay = MAX_DELAY;
 atomic_bool g_pause = false;
-atomic_bool g_running = true;
+atomic_bool g_running = false;
 
 // === Helper Functions =======================================================
 /* Handles user input events */
@@ -83,7 +83,7 @@ void game_init(void)
     g_delay = MAX_DELAY;
 }
 
-void game_start(void)
+void game_run(void)
 {
     if (pthread_create(&tid, NULL, input_task, NULL) != 0) {
         return;

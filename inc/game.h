@@ -5,7 +5,7 @@
 void game_init(void);
 
 /* Start the game */
-void game_start(void);
+void game_run(void);
 
 /* Pause the game */
 void game_pause(void);

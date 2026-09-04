@@ -18,7 +18,7 @@ int main(void)
 
             case OPTION_START:
                 game_init();
-                game_start();
+                game_run();
                 continue;
 
             case OPTION_HELP:
