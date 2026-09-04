@@ -2,7 +2,7 @@
 #define STATS_H
 
 #define SCORE_NEW_TETROMINO 10
-#define SCORE_LINE_CLEARED 1000
+#define SCORE_LINE_CLEARED  100
 
 /* Initialize the game state */
 void state_init(void);
@@ -25,7 +25,7 @@ void state_add_lines(int lines);
 /* Get max score from previous games */
 unsigned int state_high_score(void);
 
-/* Save the max score to the file */
+/* Save the high score to the file */
 void state_save_high_score(void);
 
 /* Reset the high score vlaue */
