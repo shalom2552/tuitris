@@ -4,9 +4,10 @@
 #include "tdraw.h"
 #include "board.h"
 #include "state.h"
+#include "input.h"
+#include "menu.h"
 #include "tetromino.h"
 #include "ui_assets.h"
-#include "input.h"
 
 #include <unistd.h>
 
@@ -155,6 +156,37 @@ static void draw_block(int top, int width, const char** lines, int count)
 }
 
 // === Public API =============================================================
+void ui_validate(void)
+{
+    int require_y = BOARD_HIGHT + 4;
+    int require_x = BOARD_WIDTH + PANEL_WIDTH + 8;
+    while (!tdraw_term_size_ok(require_y, require_x)) {
+        tdraw_delay(10);
+    }
+}
+
+/* Draw the menu */
+void ui_draw_menu(int selection)
+{
+    ui_validate();
+    tdraw_clear();
+    ui_title();
+    ui_subtitle();
+    int h; int w; tdraw_term_size(&h, &w);
+    int top = h / 2 + 2;
+    for (int i = 0; i < OPTION_COUNT; ++i) {
+        if (i == selection) {
+            tdraw_draw_at(1, 1, C_BOLD C_CYAN);
+            tdraw_draw_at(top + 2 * i, w / 2 - 4, "→ %s",  menu_options[i]);
+        } else {
+            tdraw_draw_at(top + 2 * i, w / 2 - 2, C_DIM "%s", menu_options[i]);
+        }
+        tdraw_draw_at(1, 1, C_RESET);
+    }
+    ui_credits();
+    tdraw_flush();
+}
+
 void ui_draw_game(void)
 {
     int h; int w; tdraw_term_size(&h, &w);
@@ -169,15 +201,6 @@ void ui_draw_game(void)
     draw_board_border();
     draw_board_cells();
     tdraw_flush();
-}
-
-void ui_validate(void)
-{
-    int require_y = BOARD_HIGHT + 4;
-    int require_x = BOARD_WIDTH + PANEL_WIDTH + 8;
-    while (!tdraw_term_size_ok(require_y, require_x)) {
-        tdraw_delay(10);
-    }
 }
 
 void ui_title(void)
@@ -197,13 +220,20 @@ void ui_title(void)
     tdraw_flush();
 }
 
+void ui_subtitle(void)
+{
+    int h; tdraw_term_size(&h, NULL);
+    tdraw_set_color(C_DIM);
+    tdraw_draw_centered_line(h - 4, "High Score: %u", state_high_score());
+    tdraw_set_color(C_RESET);
+    tdraw_flush();
+}
 
 void ui_credits(void)
 {
     int h; tdraw_term_size(&h, NULL);
-    tdraw_draw_centered_line(h - 2, C_DIM "made by shalom2552 | github.com/shalom2552/tuitris" C_RESET);
+    tdraw_draw_centered_line(h - 2, C_DIM DEV_CREDIT C_RESET);
 }
-
 
 void ui_pause(void)
 {
@@ -217,12 +247,11 @@ void ui_pause(void)
     tdraw_flush();
 }
 
-
 void ui_game_over(void)
 {
     tdraw_clear();
     int h; int w; tdraw_term_size(&h, &w);
-    if (state_score() == state_high_score()) { // High Score
+    if (state_score() > state_high_score()) { // High Score
         tdraw_set_color(C_BOLD C_GREEN);
         draw_block(h / 2 - 6, 28, ASCII_HIGH, (int)(sizeof ASCII_HIGH / sizeof *ASCII_HIGH));
         draw_block(h / 2 + 1, 41, ASCII_SCORE, (int)(sizeof ASCII_SCORE / sizeof *ASCII_SCORE));
@@ -241,4 +270,29 @@ void ui_game_over(void)
     while (event != INPUT_SELECT) { event = get_user_input(); }
 }
 
+int ui_confirm(const char* msg) {
+    int h; int w; tdraw_term_size(&h, &w);
+    tdraw_set_color(C_BOLD C_BLUE);
+    tdraw_draw_frame(h / 2 - 3, w / 2 - 20, h / 2 + 3, w / 2 + 21);
+    tdraw_draw_centered_line(h / 2 - 1, msg);
+    tdraw_set_color(C_RESET C_DIM);
+    tdraw_draw_centered_line(h / 2 + 1, "[N/y]");
+    tdraw_set_color(C_RESET);
+    tdraw_flush();
+    char c = getchar();
+    return c == 'y';
+}
+
+void ui_message(const char* msg)
+{
+    int h; int w; tdraw_term_size(&h, &w);
+    tdraw_set_color(C_BOLD C_GREEN);
+    tdraw_draw_frame(h / 2 - 3, w / 2 - 20, h / 2 + 3, w / 2 + 21);
+    tdraw_draw_centered_line(h / 2 - 1, msg);
+    tdraw_set_color(C_RESET C_DIM);
+    tdraw_draw_centered_line(h / 2 + 1, "Press any key");
+    tdraw_set_color(C_RESET);
+    tdraw_flush();
+    getchar();
+}
 

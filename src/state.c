@@ -1,7 +1,6 @@
 #include "state.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <errno.h>
 #include <sys/stat.h>
 
@@ -9,12 +8,14 @@
 
 // === Variables ==============================================================
 typedef struct {
-    int score;
-    int lines;
-    int high_score;
+    unsigned int score;
+    unsigned int lines;
+    unsigned int high_score;
 } GameState;
 
 GameState game_state;
+
+static int s_max_score_loaded = 0;
 
 // === Helper Functions =======================================================
 /* Save max score to a file */
@@ -23,7 +24,7 @@ static void save_high_score(void)
     if (mkdir("data", 0755) != 0 && errno != EEXIST) return;
     FILE* f = fopen(MAX_SCORE_FILE, "wb");
     if (f == NULL) return;
-    fprintf(f, "%d\n", game_state.high_score);
+    fprintf(f, "%u\n", game_state.high_score);
     fclose(f);
 }
 
@@ -32,7 +33,7 @@ static void load_high_score(void)
 {
     FILE* f = fopen(MAX_SCORE_FILE, "rb");
     if (f != NULL) {
-        fscanf(f, "%d", &game_state.high_score);
+        fscanf(f, "%u", &game_state.high_score);
         fclose(f);
     }
 }
@@ -46,17 +47,17 @@ void state_init(void)
     load_high_score();
 }
 
-int state_score(void)
+unsigned int state_score(void)
 {
     return game_state.score;
 }
 
-int state_level(void)
+unsigned int state_level(void)
 {
     return game_state.lines / 10 + 1;
 }
 
-int state_lines(void)
+unsigned int state_lines(void)
 {
     return game_state.lines;
 }
@@ -72,8 +73,12 @@ void state_add_lines(int lines)
     game_state.lines += lines;
 }
 
-int state_high_score(void)
+unsigned int state_high_score(void)
 {
+    if (!s_max_score_loaded) {
+        load_high_score();
+        s_max_score_loaded = 1;
+    }
     return game_state.high_score;
 }
 
@@ -83,5 +88,12 @@ void state_save_high_score(void)
         game_state.high_score = game_state.score;
     }
     save_high_score();
+}
+
+void state_reset_high_score(void)
+{
+    game_state.high_score = 0;
+    save_high_score();
+    s_max_score_loaded = 0;
 }
 

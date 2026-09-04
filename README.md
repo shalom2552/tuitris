@@ -46,10 +46,10 @@ make run    # build and run
 
 ## Scoring
 
-- 10 points per new piece
-- `1000 * level * lines * lines` for clearing lines.
-- Level is `1 + lines cleared / 10`
-- Speed increase every 10 lines cleared, delays 1000ms down to 100ms.
+- 10 points per new piece.
+- `100 * level * lines * lines` for clearing lines.
+- Level is `1 + lines cleared / 10`. Every 10 lines, level up.
+- Speed increase every level by 100ms. Delays 1000ms down to 100ms.
 
 ## Layout
 
