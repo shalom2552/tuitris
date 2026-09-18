@@ -1,6 +1,7 @@
 #include "board.h"
 
 #include "color.h"
+#include "ui.h"
 
 #include <stdbool.h>
 
@@ -81,8 +82,9 @@ int board_clear_lines(void)
     int lines_cleared = 0;
     for (int row = 0; row < BOARD_ROWS; ++row) {
         if (full_row(row)) {
-            ++lines_cleared;
+            ui_highlight_full_line(row);
             collapse_row(row);
+            ++lines_cleared;
         }
     }
     return lines_cleared;

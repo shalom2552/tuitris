@@ -203,6 +203,17 @@ void ui_draw_game(void)
     tdraw_flush();
 }
 
+void ui_highlight_full_line(int row)
+{
+    for (int color = 0; color < COLORS_COUNT; ++color) {
+        for (int j = 0; j < BOARD_COLS; ++j) {
+            board_set(row, j, color);
+            draw_board_cells();
+            tdraw_delay(5);
+        }
+    }
+}
+
 void ui_title(void)
 {
     int h; int w; tdraw_term_size(&h, &w);

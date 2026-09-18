@@ -10,6 +10,9 @@ void ui_draw_menu(int selection);
 /* Main ui function */
 void ui_draw_game(void);
 
+/* highlight a full line to be clear */
+void ui_highlight_full_line(int row);
+
 /* Draw game title */
 void ui_title(void);
 
