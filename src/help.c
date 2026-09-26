@@ -5,6 +5,8 @@
 #include "tdraw.h"
 #include "ui.h"
 
+#include <stdio.h>
+
 #define BOX_H 19
 #define BOX_W 35
 

@@ -5,30 +5,19 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <termios.h>
-#include <signal.h>
 
 static struct termios original_termios;
 
-/* Revert the terminal stage to it's original state */
-static void cleanup(void) {
+void input_reset(void) {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &original_termios);
     write(STDOUT_FILENO, "\033[?25h", 6);
-}
-
-/* Handle the SIGINT (ctl+c) to exit safely */
-static void handle_sigint_signal(int sig)
-{
-	(void)sig;
-	exit(0);
 }
 
 void input_init(void) {
 	tcgetattr(STDIN_FILENO, &original_termios);
 	write(STDOUT_FILENO, "\033[?25l", 6);
 
-	atexit(cleanup);
-
-	signal(SIGINT, handle_sigint_signal);
+	atexit(input_reset);
 
 	struct termios raw = original_termios;
 	raw.c_lflag &= ~(ECHO | ICANON);

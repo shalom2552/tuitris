@@ -1,68 +1,87 @@
 #ifndef TDRAW_H_1331063137
 #define TDRAW_H_1331063137
 
-#include <stdio.h>
-#include <stdarg.h>
+/* Get current terminal height and width */
+void tdraw_term_size(int* h, int* w);
+/* Flush the output buffer */
+void tdraw_flush(void);
+/* Flush stdout and sleeps for a given number of milliseconds */
+void tdraw_delay(int ms);
+/* Clears the screen */
+void tdraw_clear(void);
+/* Clears a given line */
+void tdraw_clear_line(int y);
+/* Draw an a color/style escape sequence */
+void tdraw_set_color(const char* c);
+/* Draws text at the specified position */
+void tdraw_draw_at(int y, int x, const char* format, ...);
+/* Draws a centered line at the specified position */
+void tdraw_draw_centered_line(int y, const char* format, ...);
+/* Draw a frame around two edges */
+void tdraw_draw_frame(int y1, int x1, int y2, int x2);
+/* Returns 1 if the terminal size is sufficient for the requested dimensions, 0 otherwise */
+int tdraw_term_size_ok(int req_h, int req_w);
+/* Reset all styles and modes */
+void tdraw_reset(void);
+/* Initialize the terminal drawing library */
+void tdraw_init(void);
+
+// #define TDRAW_IMPL
+#ifdef TDRAW_IMPL
+
+#include <ctype.h>
 #include <signal.h>
+#include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <threads.h>
 #include <time.h>
-#include <ctype.h>
-#include <sys/ioctl.h>
 #include <unistd.h>
 
-static char _tdraw_buf[65536];
-static int _tdraw_active = 0;
-
 // === Functions ==============================================================
-/* Get current terminal height and width */
-static inline void tdraw_term_size(int* h, int* w) {
+
+void tdraw_term_size(int* h, int* w) {
     struct winsize ws;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws);
     if (h) *h = ws.ws_row;
     if (w) *w = ws.ws_col;
 }
 
-/* Flush the output buffer */
-static inline void tdraw_flush(void) {
+void tdraw_flush(void) {
     printf("\033[?2026l"); // unlock output
     fflush(stdout);
     printf("\033[?2026h"); // relock output
 }
 
-/* Flush stdout and sleeps for a given number of milliseconds */
-static inline void tdraw_delay(int ms) {
+void tdraw_delay(int ms) {
     tdraw_flush();
     struct timespec ts = {ms / 1000, ms % 1000 * 1000 * 1000};
     thrd_sleep(&ts, NULL);
 }
 
 // === Drawing ================================================================
-/* Clears the screen */
-static inline void tdraw_clear(void) {
+
+void tdraw_clear(void) {
     printf("\033[H\033[J");
 }
 
-/* Clears a given line */
-static inline void tdraw_clear_line(int y) {
+void tdraw_clear_line(int y) {
     printf("\033[%d;1H\033[2K", y);
 }
 
-/* Draw an a color/style escape sequence */
-static inline void tdraw_set_color(const char* c) {
+void tdraw_set_color(const char* c) {
     printf("%s", c);
 }
 
-/* Draws text at the specified position */
-static inline void tdraw_draw_at(int y, int x, const char* format, ...) {
+void tdraw_draw_at(int y, int x, const char* format, ...) {
     char buf[256]; va_list ap;
     va_start(ap, format); vsnprintf(buf, sizeof(buf), format, ap); va_end(ap);
     printf("\033[%d;%dH%s", y, x, buf);
 }
 
-/* Draws a centered line at the specified position */
-static inline void tdraw_draw_centered_line(int y, const char* format, ...) {
+void tdraw_draw_centered_line(int y, const char* format, ...) {
     char buf[256]; va_list ap;
     va_start(ap, format); vsnprintf(buf, sizeof(buf), format, ap); va_end(ap);
     int w; tdraw_term_size(NULL, &w);
@@ -72,8 +91,8 @@ static inline void tdraw_draw_centered_line(int y, const char* format, ...) {
 }
 
 // === Boarder ================================================================
-/* Draw a frame around two edges */
-static inline void tdraw_draw_frame(int y1, int x1, int y2, int x2) {
+
+void tdraw_draw_frame(int y1, int x1, int y2, int x2) {
     for (int i = y1; i <= y2; ++i) {
         for (int j = x1 + 1; j < x2; ++j) {
             tdraw_draw_at(i, j, " ");
@@ -92,8 +111,8 @@ static inline void tdraw_draw_frame(int y1, int x1, int y2, int x2) {
 }
 
 // === Utils ==================================================================
-/* Returns 1 if the terminal size is sufficient for the requested dimensions, 0 otherwise */
-static inline int tdraw_term_size_ok(int req_h, int req_w) {
+
+int tdraw_term_size_ok(int req_h, int req_w) {
     int h; int w;
     tdraw_term_size(&h, &w);
     if (h < req_h || w < req_w) {
@@ -109,8 +128,11 @@ static inline int tdraw_term_size_ok(int req_h, int req_w) {
 }
 
 // === Init & handlers ========================================================
-/* Reset all styles and modes */
-static inline void tdraw_reset(void) {
+
+static char _tdraw_buf[65536];
+static int _tdraw_active = 0;
+
+void tdraw_reset(void) {
     if (_tdraw_active) {
         printf("\033[?2026l\033[?25h\033[0m\033[?1049l");
         _tdraw_active = 0;
@@ -118,22 +140,27 @@ static inline void tdraw_reset(void) {
     }
 }
 
-static inline void _sig_handler(int sig) {
+#ifdef TDRAW_SIG_HANDLER
+static void _tdraw_sig_handler(int sig) {
     (void)sig;
     tdraw_reset();
     exit(0);
 }
+#endif // TDRAW_SIG_HANDLER
 
-/* Initialize the terminal drawing library */
-static inline void tdraw_init(void) {
-    signal(SIGINT, _sig_handler);
-    signal(SIGTERM, _sig_handler);
+void tdraw_init(void) {
+#ifdef TDRAW_SIG_HANDLER
+    signal(SIGINT, _tdraw_sig_handler);
+    signal(SIGTERM, _tdraw_sig_handler);
+#endif // TDRAW_SIG_HANDLER
     atexit(tdraw_reset);
     _tdraw_active = 1;
     setvbuf(stdout, _tdraw_buf, _IOFBF, sizeof(_tdraw_buf));
     printf("\033[?1049h\033[?25l\033[H\033[J\033[?2026h");
     fflush(stdout);
 }
+
+#endif // TDRAW_IMPL
 
 #endif // !TDRAW_H_1331063137
 

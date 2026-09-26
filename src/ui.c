@@ -9,6 +9,7 @@
 #include "tetromino.h"
 #include "ui_assets.h"
 
+#include <stdio.h>
 #include <unistd.h>
 
 // === Defines ================================================================

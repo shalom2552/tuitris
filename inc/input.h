@@ -19,6 +19,9 @@ typedef enum {
 /* Setup input configurations */
 void input_init(void);
 
+/* Revert the terminal stage to it's original state */
+void input_reset(void);
+
 /* Get input event from user (blocking) */
 InputEvent get_user_input(void);
 

@@ -1,12 +1,25 @@
+#define TDRAW_IMPL
+#include "tdraw.h"
 #include "game.h"
 #include "help.h"
 #include "menu.h"
 #include "input.h"
 #include "settings.h"
-#include "tdraw.h"
+
+#include <signal.h>
+
+static void sig_handler(int sig)
+{
+    (void)sig;
+    tdraw_reset();
+    input_reset();
+    exit(0);
+}
 
 int main(void)
 {
+    signal(SIGINT, sig_handler);
+    signal(SIGTERM, sig_handler);
     input_init();
     tdraw_init();
 
@@ -40,3 +53,4 @@ int main(void)
 
     return 0;
 }
+
