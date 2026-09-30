@@ -42,6 +42,9 @@ static void* input_task(void* args)
             case INPUT_DOWN     : tetromino_move_down(); break;
             case INPUT_HELP     : help_card(); break;
             case INPUT_ROTATE_CW: tetromino_rotate_right(); break;
+            case INPUT_ROTATE_CCW: tetromino_rotate_left(); break;
+            case INPUT_HOLD: tetromino_hold(); break;
+            case INPUT_DROP_HARD: tetromino_hard_drop(); break;
             default: break;
         }
         if (!g_pause) ui_draw_game();

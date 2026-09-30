@@ -3,9 +3,11 @@
 #include "color.h"
 #include "board.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
+#define UNREACHABLE(...) do { fprintf(stderr, "UNREACHABLE: \n"__VA_ARGS__); abort(); } while (0)
 // === Defines ================================================================
 typedef enum {
     Straight,
@@ -49,6 +51,10 @@ static const Color TYPE_COLOR[TETROMINO_COUNT] = {
 
 static Tetromino t;
 static Tetromino next;
+static Tetromino hold;
+
+bool has_hold;
+bool holded;
 
 // === Helper Functions =======================================================
 /* Returns the position of the i'th block */
@@ -145,23 +151,34 @@ static void rotate(int dir)
     }
 }
 
+static void create_tetromino(Tetromino* t, TetrominoType type){
+    t->pos.y = 1; t->pos.x = 4;
+    t->type = type;
+    t->shape = INITIAL_SHAPES[t->type];
+    t->color = TYPE_COLOR[t->type];
+    if (rand() % 2) {
+        for (int i = 0; i < SHAPE_SIZE; ++i) {
+            rotate_block(&t->shape.blocks[i], 1);
+        }
+    }
+}
+
+static void create_random_tetromino(Tetromino* t){
+    create_tetromino(t, rand() % TETROMINO_COUNT);
+}
+
 /* Creates the next tetromino */
 static void next_tetromino(void)
 {
-    next.pos.y = 1; next.pos.x = 4;
-    next.type  = rand() % TETROMINO_COUNT;
-    next.shape = INITIAL_SHAPES[next.type];
-    next.color = TYPE_COLOR[next.type];
-    if (rand() % 2) {
-        for (int i = 0; i < SHAPE_SIZE; ++i) {
-            rotate_block(&next.shape.blocks[i], 1);
-        }
-    }
+    holded = false;
+    create_random_tetromino(&next);
 }
 
 // === Public API =============================================================
 void tetromino_init(void)
 {
+    has_hold = false;
+    holded   = false;
     next_tetromino();
 }
 
@@ -201,6 +218,47 @@ void tetromino_rotate_left(void)
     place_tetromino();
 }
 
+void tetromino_hold(void)
+{
+    if (holded){
+        return;
+    }
+    remove_tetromino();
+
+    Tetromino previous_hold = hold;
+    create_tetromino(&hold, t.type);
+
+    t = has_hold ? previous_hold : next;
+    if (!has_hold){
+        next_tetromino();
+        has_hold = true;
+    }
+
+    place_tetromino();
+    holded = true;
+}
+
+void tetromino_hard_drop(void)
+{
+    while(true){
+        if (tetromino_locked()){
+            return;
+        }
+        move(1, 0);
+    }
+    UNREACHABLE("tetromino_hard_drop");
+}
+
+bool tetromino_has_hold(void)
+{
+    return has_hold;
+}
+
+bool tetromino_holded(void)
+{
+    return holded;
+}
+
 bool tetromino_locked(void)
 {
     remove_tetromino();
@@ -211,9 +269,17 @@ bool tetromino_locked(void)
 
 TetrominoPeek tetromino_peek_next(void)
 {
-    TetrominoPeek peak;
-    peak.color = next.color;
-    peak.shape = next.shape;
-    return peak;
+    TetrominoPeek peek;
+    peek.color = next.color;
+    peek.shape = next.shape;
+    return peek;
+}
+
+TetrominoPeek tetromino_peek_hold(void)
+{
+    TetrominoPeek peek;
+    peek.color = hold.color;
+    peek.shape = hold.shape;
+    return peek;
 }
 

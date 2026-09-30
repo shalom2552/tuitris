@@ -14,58 +14,61 @@ void input_reset(void) {
 }
 
 void input_init(void) {
-	tcgetattr(STDIN_FILENO, &original_termios);
-	write(STDOUT_FILENO, "\033[?25l", 6);
+    tcgetattr(STDIN_FILENO, &original_termios);
+    write(STDOUT_FILENO, "\033[?25l", 6);
 
-	atexit(input_reset);
+    atexit(input_reset);
 
-	struct termios raw = original_termios;
-	raw.c_lflag &= ~(ECHO | ICANON);
-	raw.c_cc[VMIN] = 1;
-	raw.c_cc[VTIME] = 0;
+    struct termios raw = original_termios;
+    raw.c_lflag &= ~(ECHO | ICANON);
+    raw.c_cc[VMIN] = 1;
+    raw.c_cc[VTIME] = 0;
 
-	tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
 
 InputEvent get_user_input(void)
 {
-	char c;
-	while (1) {
-		fd_set readfds;
-		FD_ZERO(&readfds);
-		FD_SET(STDIN_FILENO, &readfds);
-		select(STDIN_FILENO + 1, &readfds, NULL, NULL, NULL);
-		if (read(STDIN_FILENO, &c, 1) != 1) {
-			continue;
-		}
+    char c;
+    while (1) {
+        fd_set readfds;
+        FD_ZERO(&readfds);
+        FD_SET(STDIN_FILENO, &readfds);
+        select(STDIN_FILENO + 1, &readfds, NULL, NULL, NULL);
+        if (read(STDIN_FILENO, &c, 1) != 1) {
+            continue;
+        }
 
-		switch (c) {
-			case 'q' : return INPUT_QUIT;
-			case ' ' : case 'r': return INPUT_ROTATE_CW;
-			case '\n': return INPUT_SELECT;
+        switch (c) {
+            case 'q': return INPUT_QUIT;
+            case ' ': case 'r': return INPUT_ROTATE_CW;
+            case 'z': return INPUT_ROTATE_CCW;
+            case 'c': return INPUT_HOLD; 
+            case 'x': return INPUT_DROP_HARD;
+            case '\n': return INPUT_SELECT;
             case '+' : return INPUT_PLUS;
             case '-' : return INPUT_MINUS;
             case 'h' : return INPUT_HELP;
             case 'p' : return INPUT_PAUSE;
-			case '\033':
-				{
-					char seq[2];
-					if (read(STDIN_FILENO, &seq[0], 1) != 1 ||
-						read(STDIN_FILENO, &seq[1], 1) != 1)  {
-						return INPUT_QUIT;
-					}
+            case '\033':
+                {
+                    char seq[2];
+                    if (read(STDIN_FILENO, &seq[0], 1) != 1 ||
+                        read(STDIN_FILENO, &seq[1], 1) != 1)  {
+                        return INPUT_QUIT;
+                    }
 
-					if (seq[0] == '[') {
-						switch (seq[1]) {
-							case 'A': return INPUT_UP;
-							case 'B': return INPUT_DOWN;
-							case 'C': return INPUT_RIGHT;
-							case 'D': return INPUT_LEFT;
-						}
-					}
-				}
-				break;
-		}
-	}
+                    if (seq[0] == '[') {
+                        switch (seq[1]) {
+                            case 'A': return INPUT_UP;
+                            case 'B': return INPUT_DOWN;
+                            case 'C': return INPUT_RIGHT;
+                            case 'D': return INPUT_LEFT;
+                        }
+                    }
+                }
+                break;
+        }
+    }
 }
 

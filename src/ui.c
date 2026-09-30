@@ -24,8 +24,8 @@
 #define DRAW_START_X(w) (((w) - FRAME_WIDTH) / 2 + 1)
 
 // === Variables ==============================================================
-static int y;
-static int x;
+static int y;  // initialized in ui_draw_game()
+static int x;  // initialized in ui_draw_game()
 
 // === Helper Functions =======================================================
 #define min(a, b) ((a) < (b) ? (a) : (b))
@@ -81,16 +81,18 @@ static void draw_frame(void)
     tdraw_draw_at(y, x + 8 , C_DIM C_BLUE "<" C_RESET C_BOLD C_CYAN " TUITRIS " C_RESET C_DIM C_BLUE ">" C_RESET);
 }
 
-/* Draw board and panel frames */
-static void draw_next_preview(void)
+static void draw_tetromino_preview(TetrominoPeek peek, bool empty, int preview_x, int preview_y, char* label)
 {
+    if (empty){
+        return;
+    }
+
     int preview_size = PANEL_WIDTH / 2 - 2;
-    int preview_y = y + 1; int preview_x = x + BOARD_WIDTH + 6;
     tdraw_set_color(C_DIM C_BLUE);
     tdraw_draw_frame(preview_y, preview_x - 1, preview_y + preview_size, preview_x + 2 * preview_size);
     tdraw_set_color(C_RESET);
-    tdraw_draw_at(preview_y, preview_x + 1, C_CYAN "Next" C_RESET);
-    TetrominoPeek peek = tetromino_peek_next();
+    tdraw_draw_at(preview_y, preview_x + 1, C_CYAN "%s" C_RESET, label);
+
     int min_y = peek.shape.blocks[0].y; int max_y = min_y;
     int min_x = peek.shape.blocks[0].x; int max_x = min_x;
     for (int i = 0; i < SHAPE_SIZE; ++i) {
@@ -109,6 +111,19 @@ static void draw_next_preview(void)
         int px = preview_x + 1 + pad_x + 2 * (p.x - min_x);
         tdraw_draw_at(py, px, "%s%s%s", color_code(peek.color), BLOCK_FILL, C_RESET);
     }
+}
+
+/* Draw board and panel frames */
+static void draw_next_preview(void)
+{
+    int preview_y = y + 1; int preview_x = x + BOARD_WIDTH + 6;
+    draw_tetromino_preview(tetromino_peek_next(), false, preview_x, preview_y, "Next");
+}
+
+static void draw_hold_preview(void)
+{
+    int preview_y = y + 1; int preview_x = x - BOARD_WIDTH + 10;
+    draw_tetromino_preview(tetromino_peek_hold(), !tetromino_has_hold(), preview_x, preview_y, "Hold");
 }
 
 /* Draw game state */
@@ -160,7 +175,7 @@ static void draw_block(int top, int width, const char** lines, int count)
 void ui_validate(void)
 {
     int require_y = BOARD_HIGHT + 4;
-    int require_x = BOARD_WIDTH + PANEL_WIDTH + 8;
+    int require_x = BOARD_WIDTH + 3 * PANEL_WIDTH + 8;
     while (!tdraw_term_size_ok(require_y, require_x)) {
         tdraw_delay(10);
     }
@@ -199,6 +214,7 @@ void ui_draw_game(void)
     draw_state();
     draw_legend();
     draw_next_preview();
+    draw_hold_preview();
     draw_board_border();
     draw_board_cells();
     tdraw_flush();

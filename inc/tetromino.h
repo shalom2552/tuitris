@@ -2,6 +2,7 @@
 #define TETROMINO_H
 
 #include "color.h"
+
 #include <stdbool.h>
 
 #define SHAPE_SIZE 4
@@ -35,11 +36,24 @@ void tetromino_rotate_right(void);
 /* Rotates the tetromino counterclockwise if it can */
 void tetromino_rotate_left(void);
 
+/* Stores current tetromino and replaces current with the next one */
+void tetromino_hold(void);
+
+/* Drops tetromino instantly to the furthest down free block */
+void tetromino_hard_drop(void);
+
+/* returns true if there is currently an holded tetromino */
+bool tetromino_has_hold(void);
+
+/* returns true if the tetromino as been hold */
+bool tetromino_holded(void);
+
 /* Returns 1 if the tetromino is locked in place, 0 otherwise */
 bool tetromino_locked(void);
 
 /* Returns peak of the next tetromino */
 TetrominoPeek tetromino_peek_next(void);
+TetrominoPeek tetromino_peek_hold(void);
 
 #endif // !TETROMINO_H
 
