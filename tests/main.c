@@ -10,10 +10,10 @@ void test_state(void);
 
 static void test(void (*test_suite)(void), const char* name)
 {
-    printf("Running %s...", name);
+    fprintf(stderr, "Running %s...", name);
     fflush(stdout);
     test_suite();
-    printf("[OK]\n");
+    fprintf(stderr, "[OK]\n");
 }
 
 int main(void)
