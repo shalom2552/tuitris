@@ -1,6 +1,23 @@
 #ifndef UI_H
 #define UI_H
 
+/* Debug output. stdout is taken by the game ui, so messages are written to a
+ * separate descriptor instead. The target is picked once, on first use:
+ *   - $TUITRIS_DEBUG=<path>: append to that file
+ *   - stderr when it is not the terminal the game draws on (e.g. `2>debug.log`)
+ *   - otherwise the file below, so the ui is never corrupted
+ * Compiling with -DNDEBUG compiles DEBUG() away completely. */
+#define DEBUG_LOG_FILE "tuitris-debug.log"
+
+void ui_debug(const char* file, int line, const char* fmt, ...)
+    __attribute__((format(printf, 3, 4)));
+
+#ifdef NDEBUG
+#define DEBUG(...) do { } while (0)
+#else
+#define DEBUG(...) ui_debug(__FILE__, __LINE__, __VA_ARGS__)
+#endif // NDEBUG
+
 /* Validate termianl size (blocking) */
 void ui_validate(void);
 

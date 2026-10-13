@@ -5,3 +5,6 @@ game
 
 # game state
 data
+
+# debug
+tuitris-debug.log

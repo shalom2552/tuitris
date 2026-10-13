@@ -1,5 +1,11 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -pedantic -std=c17 -Iinc -g -pthread
+CFLAGS = -Wall -Wextra -pedantic -std=c17 -Iinc -pthread
+
+ifdef DEBUG
+CFLAGS += -O0 -g
+else
+CFLAGS += -O2 -DNDEBUG
+endif
 
 BLD = build
 TRG = $(BLD)/game

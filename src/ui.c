@@ -9,8 +9,14 @@
 #include "tetromino.h"
 #include "ui_assets.h"
 
+#include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <unistd.h>
+
+#include <fcntl.h>
+#include <sys/stat.h>
 
 // === Defines ================================================================
 #define PANEL_WIDTH 14
@@ -172,6 +178,78 @@ static void draw_block(int top, int width, const char** lines, int count)
 }
 
 // === Public API =============================================================
+
+#ifndef NDEBUG
+static int debug_fd = -1;
+static bool debug_fd_ready = false;
+
+/* True when stderr is the very terminal the game draws on */
+static bool debug_stderr_is_game_screen(void)
+{
+    struct stat out, err;
+    if (fstat(STDOUT_FILENO, &out) != 0) return false;
+    if (fstat(STDERR_FILENO, &err) != 0) return false;
+    return out.st_dev == err.st_dev && out.st_ino == err.st_ino;
+}
+
+static void debug_open(void)
+{
+    debug_fd_ready = true;
+
+    const char* path = getenv("TUITRIS_DEBUG");
+    if (path != NULL && path[0] != '\0') {
+        debug_fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0644);
+        if (debug_fd >= 0) return;
+    }
+
+    if (!debug_stderr_is_game_screen()) {
+        debug_fd = STDERR_FILENO;
+        return;
+    }
+
+    debug_fd = open(DEBUG_LOG_FILE, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (debug_fd < 0) debug_fd = STDERR_FILENO;  // last resort, may hit the ui
+}
+#endif // NDEBUG
+
+void ui_debug(const char* file, int line, const char* fmt, ...)
+{
+#ifndef NDEBUG
+    if (!debug_fd_ready) debug_open();
+    if (debug_fd < 0) return;
+
+    struct timespec now;
+    clock_gettime(CLOCK_REALTIME, &now);
+    struct tm tm;
+    localtime_r(&now.tv_sec, &tm);
+    char time[16];
+    strftime(time, sizeof time, "%H:%M:%S", &tm);
+
+    char head[128];
+    int head_len = snprintf(head, sizeof head, "DEBUG: %s.%03ld %s:%d ",
+                            time, (long)(now.tv_nsec / 1000000), file, line);
+
+    char msg[512];
+    va_list args;
+    va_start(args, fmt);
+    int msg_len = vsnprintf(msg, sizeof msg, fmt, args);
+    va_end(args);
+    if (msg_len < 0) return;
+
+    char line_buf[sizeof head + sizeof msg];
+    int len = snprintf(line_buf, sizeof line_buf, "%.*s%.*s\n",
+                       (int)(head_len > 0 ? head_len : 0), head,
+                       msg_len < (int)sizeof msg ? msg_len : (int)sizeof msg - 1,
+                       msg);
+    if (len > 0) {
+        ssize_t ignored = write(debug_fd, line_buf, (size_t)len);
+        (void)ignored;
+    }
+#else
+    (void)file; (void)line; (void)fmt;
+#endif // NDEBUG
+}
+
 void ui_validate(void)
 {
     int require_y = BOARD_HIGHT + 4;
