@@ -1,5 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -pedantic -std=c17 -Iinc -pthread
+VERSION := $(shell git describe --abbrev=0 --always --tags)
+CFLAGS  += -DVERSION=\"$(VERSION)\"
 
 ifdef DEBUG
 CFLAGS += -O0 -g

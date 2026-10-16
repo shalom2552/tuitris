@@ -7,7 +7,11 @@
 #define BLOCK_FILL "██"
 #define BAR_FILL "████████████████████████"
 
-#define DEV_CREDIT "made by shalom2552 | github.com/shalom2552/tuitris"
+#ifndef VERSION
+#define VERSION "unknown"
+#endif /* ifndef VERSION */
+
+#define DEV_CREDIT "made by shalom2552 | github.com/shalom2552/tuitris | " VERSION
 
 /* Per-letter colors of "TUITRIS" */
 #define T_T1 C_RED
