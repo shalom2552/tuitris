@@ -4,7 +4,9 @@
 #include "color.h"
 
 #define BLOCK_EMPTY "  "
-#define BLOCK_FILL "██"
+// #define BLOCK_FILL "██"
+#define BLOCK_FILL "\033[53;4;58;5;0m\033[7m\u258F\u2595\033[0m"
+
 #define BAR_FILL "████████████████████████"
 
 #ifndef VERSION

@@ -51,12 +51,16 @@ static void clear_screen(void)
 /* Draws the border of the board */
 static void draw_board_border(void)
 {
-    tdraw_draw_at(y + 1, x + 1, C_DIM C_CYAN BAR_FILL C_RESET);
-    for (int i = 0; i < BOARD_ROWS; ++i) {
-        tdraw_draw_at(y + 2 + i, x + 1,                  C_DIM C_CYAN BLOCK_FILL C_RESET);
-        tdraw_draw_at(y + 2 + i, x + 3 + BOARD_COLS * 2, C_DIM C_CYAN BLOCK_FILL C_RESET);
+    for (int i = 0; i < BOARD_COLS + 2; i++) {
+        tdraw_draw_at(y + 1, x + 1 + 2 * i, C_DIM C_WHITE BLOCK_FILL C_RESET);
     }
-    tdraw_draw_at(y + 2 + BOARD_ROWS, x + 1, C_DIM C_CYAN BAR_FILL C_RESET);
+    for (int i = 0; i < BOARD_ROWS; ++i) {
+        tdraw_draw_at(y + 2 + i, x + 1,                  C_DIM C_WHITE BLOCK_FILL C_RESET);
+        tdraw_draw_at(y + 2 + i, x + 3 + BOARD_COLS * 2, C_DIM C_WHITE BLOCK_FILL C_RESET);
+    }
+    for (int i = 0; i < BOARD_COLS + 2; i++) {
+        tdraw_draw_at(y + 2 + BOARD_ROWS, x + 1 + 2 * i, C_DIM C_WHITE BLOCK_FILL C_RESET);
+    }
 }
 
 /* Draws the cells of the board */
